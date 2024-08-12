@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/devel
+
+Name: tycho_launchers
+Description: Description of tycho_launchers
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

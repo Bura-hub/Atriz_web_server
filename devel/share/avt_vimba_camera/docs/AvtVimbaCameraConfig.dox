@@ -1,0 +1,58 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~acquisition_mode" : \b [str] Camera acquisition mode min: , default: Continuous, max: 
+- \b "~acquisition_rate" : \b [double] Sets the expected triggering rate in externally triggered mode. min: 1.0, default: 10.0, max: 35.0
+- \b "~trigger_source" : \b [str] Camera trigger source min: , default: FixedRate, max: 
+- \b "~trigger_mode" : \b [str] Camera trigger mode min: , default: On, max: 
+- \b "~trigger_selector" : \b [str] Camera trigger selector min: , default: FrameStart, max: 
+- \b "~trigger_activation" : \b [str] Camera trigger activation min: , default: RisingEdge, max: 
+- \b "~trigger_delay" : \b [double] Trigger delay in us (only valid when set to external trigger) min: 0.0, default: 0.0, max: 60000000.0
+- \b "~action_device_key" : \b [int] Camera action device key min: 1, default: 1, max: 4294967295
+- \b "~action_group_key" : \b [int] Camera action group key min: 1, default: 1, max: 4294967295
+- \b "~action_group_mask" : \b [int] Camera action group mask min: 1, default: 1, max: 4294967295
+- \b "~exposure" : \b [double] Camera exposure time in microseconds. min: 41.0, default: 50000.0, max: 60000000.0
+- \b "~exposure_auto" : \b [str] Sets the camera exposure. If continously automatic, causes the `~exposure` setting to be ignored. min: , default: Continuous, max: 
+- \b "~exposure_auto_alg" : \b [str] The following algorithms can be used to calculate auto exposure min: , default: FitRange, max: 
+- \b "~exposure_auto_tol" : \b [int] Tolerance in variation from ExposureAutoTarget in which the auto exposure algorithm will not respond. min: 0, default: 5, max: 50
+- \b "~exposure_auto_max" : \b [int] The max exposure time in auto exposure mode, in microseconds. min: 29, default: 50000, max: 85899341
+- \b "~exposure_auto_min" : \b [int] The min exposure time in auto exposure mode, in microseconds. min: 29, default: 45, max: 85899341
+- \b "~exposure_auto_outliers" : \b [int] The total pixels from top of the distribution that are ignored by the auto exposure algorithm (0.01% increments) min: 0, default: 0, max: 10000
+- \b "~exposure_auto_rate" : \b [int] The rate at which the auto exposure function changes the exposure setting.100% is auto exposure adjustments running at full speed, and 50% is half speed. min: 1, default: 100, max: 100
+- \b "~exposure_auto_target" : \b [int] The auto exposure target mean value as a percentage, from 0=black to 100=white. min: 0, default: 50, max: 100
+- \b "~gain" : \b [double] The gain level in dB. min: 0.0, default: 0.0, max: 40.0
+- \b "~gain_auto" : \b [str] Sets the analog gain. If continously automatic, causes the `~gain` setting to be ignored. min: , default: Continuous, max: 
+- \b "~gain_auto_adjust_tol" : \b [int] Tolerance in variation from GainAutoTarget in which the auto exposure algorithm will not respond. min: 0, default: 5, max: 50
+- \b "~gain_auto_max" : \b [double] The max gain level in auto gain mode, in dB. min: 0.0, default: 32.0, max: 40.0
+- \b "~gain_auto_min" : \b [double] The min gain level in auto gain mode, in dB. min: 0.0, default: 0.0, max: 40.0
+- \b "~gain_auto_outliers" : \b [int] The total pixels from top of the distribution that are ignored by the auto gain algorithm (0.01% increments). min: 0, default: 0, max: 10000
+- \b "~gain_auto_rate" : \b [int] The rate percentage at which the auto gain function changes. min: 1, default: 50, max: 100
+- \b "~gain_auto_target" : \b [int] The general lightness or darkness of the auto gain feature. A percentage of maximum brightness. min: 0, default: 50, max: 100
+- \b "~balance_ratio_abs" : \b [double] Adjusts the gain of the channel selected in the `~BalanceRatioSelector` min: 0.25, default: 1.0, max: 4.0
+- \b "~balance_ratio_selector" : \b [str] Select the Red or Blue channel to adjust with `~BalanceRatioAbs` min: , default: Red, max: 
+- \b "~whitebalance_auto" : \b [str] Whether whitebalance will continuously adjust to the current scene. Causes the `~whitebalance_red` and `~whitebalance_blue` settings to be ignored. min: , default: Continuous, max: 
+- \b "~whitebalance_auto_tol" : \b [int] Tolerance allowed from the ideal white balance values min: 0, default: 5, max: 50
+- \b "~whitebalance_auto_rate" : \b [int] Rate of white balance adjustments, from 1 (slowest) to 100 (fastest). min: 1, default: 100, max: 100
+- \b "~binning_x" : \b [int] Number of pixels to bin together horizontally. min: 1, default: 1, max: 8
+- \b "~binning_y" : \b [int] Number of pixels to bin together vertically. min: 1, default: 1, max: 14
+- \b "~decimation_x" : \b [int] Number of decimation operations in x. min: 1, default: 1, max: 8
+- \b "~decimation_y" : \b [int] Number of decimation operations in y. min: 1, default: 1, max: 8
+- \b "~width" : \b [int] Width of the region of interest (0 for automatic). min: 4, default: 4096, max: 4096
+- \b "~height" : \b [int] Height of the region of interest (0 for automatic). min: 4, default: 4096, max: 4096
+- \b "~offset_x" : \b [int] X offset of the region of interest. min: 0, default: 0, max: 4095
+- \b "~offset_y" : \b [int] Y offset of the region of interest. min: 0, default: 0, max: 4095
+- \b "~pixel_format" : \b [str] Format of the image data. min: , default: Mono8, max: 
+- \b "~stream_bytes_per_second" : \b [int] Limits the data rate of the camera. min: 1, default: 124000000, max: 125000000
+- \b "~ptp_mode" : \b [str] Controls the PTP behavior of the clock port. min: , default: Off, max: 
+- \b "~sync_in_selector" : \b [str] Selects the sync-out line to control min: , default: SyncIn1, max: 
+- \b "~sync_out_polarity" : \b [str] Polarity applied to the sync-out line specified by `sync_out_selector` min: , default: Normal, max: 
+- \b "~sync_out_selector" : \b [str] Selects the sync-out line to control min: , default: SyncOut1, max: 
+- \b "~sync_out_source" : \b [str] Signal source of the sync-out line specified by `sync_out_selector` min: , default: GPO, max: 
+- \b "~line_selector" : \b [str] Selects the line to control min: , default: Line0, max: 
+- \b "~line_mode" : \b [str] Controls the mode of the line specified by `line_selector` min: , default: Input, max: 
+- \b "~iris_auto_target" : \b [int] This is the target image mean value, in percent. min: 0, default: 50, max: 100
+- \b "~iris_mode" : \b [str] Set the iris mode. Disabled: no iris control. Video: enable video iris. VideoOpen: fully open a video iris. VideoClose: fully close a video iris. min: , default: Continuous, max: 
+- \b "~iris_video_level_min" : \b [int] Minimum video iris level output by the camera, in approximately mV pp. A higher minimum value slows the adjustment time but prevents excessive overshoot. min: 0, default: 110, max: 150
+- \b "~iris_video_level_max" : \b [int] Maximum video iris level output by the camera, in approximately mV pp. A lower minimum value slows the adjustment time but prevents excessive overshoot. min: 0, default: 110, max: 150
+

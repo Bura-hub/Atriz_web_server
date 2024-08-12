@@ -1,0 +1,2 @@
+demiurge-tycho/avt_vimba_camera:demiurge-tycho/tycho_aruco:demiurge-tycho/tycho_cropper:demiurge-tycho/tycho_launchers:demiurge-tycho/tycho_recorder:demiurge-tycho/tycho_tracker:demiurge-tycho/tycho_transformer:web_server
+-DCATKIN_DEVEL_PREFIX=/home/atriz/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/atriz/catkin_ws/install -G Unix Makefiles

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20240603-0050-Experimental"
+	Name="Atriz"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/c++"
+	CompilerVersion="9.4.0"
+	OSName="Linux"
+	Hostname="Atriz"
+	OSRelease="5.15.0-107-generic"
+	OSVersion="#117~20.04.1-Ubuntu SMP Tue Apr 30 10:35:57 UTC 2024"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="23"
+	ModelID="104"
+	ProcessorCacheSize="512"
+	NumberOfLogicalCPU="12"
+	NumberOfPhysicalCPU="6"
+	TotalVirtualMemory="2047"
+	TotalPhysicalMemory="7314"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="2100"
+	>
+	<Testing>
+		<StartDateTime>Jun 02 19:50 -05</StartDateTime>
+		<StartTestTime>1717375820</StartTestTime>
+		<TestList/>
+		<EndDateTime>Jun 02 19:50 -05</EndDateTime>
+		<EndTestTime>1717375820</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

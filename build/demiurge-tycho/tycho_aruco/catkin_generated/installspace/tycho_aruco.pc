@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/install
+
+Name: tycho_aruco
+Description: Description of tycho_aruco
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

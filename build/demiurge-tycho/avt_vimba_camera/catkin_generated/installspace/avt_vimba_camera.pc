@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/install
+
+Name: avt_vimba_camera
+Description: Description of avt_vimba_camera
+Version: 1.2.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: camera_info_manager diagnostic_updater dynamic_reconfigure image_transport roscpp sensor_msgs std_msgs

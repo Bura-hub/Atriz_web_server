@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/install
+
+Name: tycho_tracker
+Description: Description of tycho_tracker
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: cv_bridge image_transport roscpp sensor_msgs std_msgs geometry_msgs message_runtime

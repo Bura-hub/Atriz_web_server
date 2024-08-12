@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/install
+
+Name: tycho_transformer
+Description: Description of tycho_transformer
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
