@@ -5,6 +5,7 @@ cleanup_ports() {
     echo "LIBERANDO PUERTOS..."
     fuser -k 8000/tcp
     fuser -k 8080/tcp
+    fuser -k 80/tcp
     # Agrega más puertos si es necesario
 }
 
@@ -29,6 +30,9 @@ roscore &
 ROSCORE_PID=$!
 sleep 5  # Esperar a que roscore esté completamente iniciado
 
+# Iniciar nginx
+sudo systemctl restart nginx
+
 # Iniciar la cámara USB
 echo "Iniciando la Camara..."
 roslaunch web_server camera.launch &
@@ -37,8 +41,10 @@ roslaunch web_server camera.launch &
 echo "Iniciando el Web_server..."
 roslaunch web_server web_video.launch &
 
-# Iniciar el servidor web para el cliente (usando Python para simplicidad)
-cd ~/catkin_ws/web_client
-python3 -m http.server 8000 &
+# Construir el proyecto Vue.js
+echo "Construyendo el proyecto Vue.js..."
+cd ~/catkin_ws/swarm-robotics-panel
+npm install
+npm run build
 
 echo "Swarm Lab iniciado. Accede al cliente web en http://localhost:8000"
