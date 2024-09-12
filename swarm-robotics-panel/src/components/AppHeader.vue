@@ -7,8 +7,8 @@
       <p class="text-gray-400">Remote Control Interface</p>
     </div>
     <div class="mt-4 md:mt-0">
-      <button class="bg-blue-500 p-2 rounded-md text-white">
-        Python & Reset
+      <button @click="logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        Logout
       </button>
     </div>
   </header>
@@ -17,5 +17,12 @@
 <script>
 export default {
   name: "AppHeader",
+  methods: {
+    logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('full_name');
+      this.$router.push('/login');
+    }
+  }
 };
 </script>

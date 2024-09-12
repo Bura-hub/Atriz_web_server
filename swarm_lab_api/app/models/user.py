@@ -5,6 +5,6 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)  # Asegurar que el nombre de usuario sea único
+    username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    full_name = Column(String)  # Agregar el campo de nombre completo
+    full_name = Column(String)

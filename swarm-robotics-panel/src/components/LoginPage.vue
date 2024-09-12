@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrapper">
     <div class="login-container">
-      <h1 class="app-title">Atriz RVR</h1> <!-- Título añadido -->
+      <h1 class="app-title">Atriz RVR</h1>
       <h2>Sign In</h2>
       <form @submit.prevent="login">
         <div class="input-group">
@@ -44,8 +44,15 @@ export default {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
-        localStorage.setItem('access_token', response.data.access_token);
-        this.$router.push('/');
+
+        const accessToken = response.data.access_token;
+        localStorage.setItem('access_token', accessToken);
+
+        // Decodificar el token para obtener el nombre completo del usuario
+        const userInfo = JSON.parse(atob(accessToken.split('.')[1]));
+        localStorage.setItem('full_name', userInfo.full_name);
+
+        this.$router.push('/'); // Redirige al dashboard
       } catch (error) {
         this.error = 'Login failed. Please check your username and password.';
         console.error('Login failed:', error);
