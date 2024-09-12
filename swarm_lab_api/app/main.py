@@ -34,6 +34,4 @@ app.include_router(experiments.router, prefix="/api", tags=["Experiments"])
 app.include_router(robots.router, prefix="/api", tags=["Robots"])
 app.include_router(updates.router, prefix="/api", tags=["Updates"])
 app.include_router(users.router, prefix="/api", tags=["Users"])
-
-# Rutas que requieren autenticación
-app.include_router(scripts.router, tags=["Scripts"], dependencies=[Depends(get_current_user)])
+app.include_router(scripts.router, prefix="/api", tags=["Scripts"])

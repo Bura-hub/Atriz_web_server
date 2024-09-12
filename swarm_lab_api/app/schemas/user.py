@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 class UserBase(BaseModel):
     username: str
+    full_name: str  # Agregar el campo de nombre completo
 
 class UserCreate(UserBase):
     password: str
