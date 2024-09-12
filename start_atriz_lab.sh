@@ -6,7 +6,7 @@ cleanup_ports() {
     fuser -k 8000/tcp
     fuser -k 8080/tcp
     fuser -k 80/tcp
-    # Agrega más puertos si es necesario
+    fuser -k 5000/tcp  # Añadir el puerto 5000 si no estaba
 }
 
 # Función para finalizar procesos
@@ -16,6 +16,7 @@ terminate_processes() {
     pkill -f roslaunch
     pkill -f "python3 -m http.server"
     pkill -f usb_cam_node
+    pkill -f "uvicorn app.main:app"  # Detener FastAPI si ya está corriendo
 }
 
 # Ejecutar la función de finalización de procesos
@@ -41,10 +42,16 @@ roslaunch web_server camera.launch &
 echo "Iniciando el Web_server..."
 roslaunch web_server web_video.launch &
 
+# Iniciar la API de FastAPI con Uvicorn
+echo "Iniciando la API FastAPI..."
+source ~/catkin_ws/swarm_lab_env/bin/activate
+cd ~/catkin_ws/swarm_lab_api
+uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload &
+
 # Construir el proyecto Vue.js
 echo "Construyendo el proyecto Vue.js..."
 cd ~/catkin_ws/swarm-robotics-panel
 npm install
 npm run build
 
-echo "Swarm Lab iniciado. Accede al cliente web en http://localhost:8000"
+echo "SWARM LAB INICIADO"

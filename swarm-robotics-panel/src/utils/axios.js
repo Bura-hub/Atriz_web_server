@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configuración de Axios
 const instance = axios.create({
-  baseURL: 'http://localhost:5000', // Ajusta la URL base a tu configuración
+  baseURL: 'http://atriz-project.duckdns.org/api', // Ajusta la URL base a tu configuración
 });
 
 // Interceptor para añadir el token a cada solicitud

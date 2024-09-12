@@ -11,22 +11,29 @@ Base.metadata.create_all(bind=engine)
 # Crear la aplicación FastAPI
 app = FastAPI(title="Swarm Robotics Lab API")
 
+# Configuración de CORS
+origins = [
+    "http://atriz-project.duckdns.org",  # Añade aquí el origen de tu frontend
+    "http://localhost",  # Si estás probando desde localhost
+    "http://localhost:8080",  # Si usas Vue CLI en localhost
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir solicitudes de estos orígenes
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos HTTP
-    allow_headers=["*"],  # Permitir todos los encabezados
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
 # Incluir routers para las rutas públicas y protegidas
 
 # Rutas que pueden ser públicas
-app.include_router(experiments.router, tags=["Experiments"])
-app.include_router(robots.router, tags=["Robots"])
-app.include_router(updates.router, tags=["Updates"])
-app.include_router(users.router, tags=["Users"])
+app.include_router(experiments.router, prefix="/api", tags=["Experiments"])
+app.include_router(robots.router, prefix="/api", tags=["Robots"])
+app.include_router(updates.router, prefix="/api", tags=["Updates"])
+app.include_router(users.router, prefix="/api", tags=["Users"])
 
 # Rutas que requieren autenticación
 app.include_router(scripts.router, tags=["Scripts"], dependencies=[Depends(get_current_user)])
