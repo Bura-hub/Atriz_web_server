@@ -1,15 +1,42 @@
-import rospy
-from std_msgs.msg import String
+import os
+import subprocess
 
-class ROSBridge:
-    def __init__(self):
-        rospy.init_node('ros_bridge_node')
-        self.pub = rospy.Publisher('robot_commands', String, queue_size=10)
+def send_code_to_ros(code, robot_ip):
+    """
+    Envía código Python a una Raspberry Pi remota que ejecuta un nodo ROS.
+    
+    Args:
+        code (str): El código Python a ejecutar.
+        robot_ip (str): Dirección IP del robot (Raspberry Pi).
+    
+    Returns:
+        str: Resultado de la ejecución o error.
+    """
+    try:
+        # Guardar el código en un archivo temporal local
+        local_script_path = "/tmp/user_script.py"
+        with open(local_script_path, "w") as f:
+            f.write(code)
 
-    def send_command(self, command: str):
-        rospy.loginfo(f"Sending command: {command}")
-        self.pub.publish(command)
+        # Transferir el script a la Raspberry Pi usando scp
+        remote_script_path = f"{robot_ip}:/tmp/user_script.py"
+        scp_command = ["scp", local_script_path, remote_script_path]
+        scp_result = subprocess.run(scp_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    def receive_updates(self):
-        # Implement logic to subscribe and handle updates
-        pass
+        if scp_result.returncode != 0:
+            raise Exception(f"Error al transferir script: {scp_result.stderr.decode()}")
+
+        # Ejecutar el script en la Raspberry Pi usando ssh y rosrun
+        ssh_command = [
+            "ssh", robot_ip,
+            "rosrun sphero_rvr_pkg script_executor.py /tmp/user_script.py"
+        ]
+        ssh_result = subprocess.run(ssh_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        if ssh_result.returncode != 0:
+            raise Exception(f"Error al ejecutar el script en ROS: {ssh_result.stderr.decode()}")
+
+        return ssh_result.stdout.decode()
+
+    except Exception as e:
+        return f"Error: {str(e)}"

@@ -9,7 +9,13 @@ from app.dependencies import get_current_user  # Dependencia para la autenticaci
 Base.metadata.create_all(bind=engine)
 
 # Crear la aplicación FastAPI
-app = FastAPI(title="Swarm Robotics Lab API")
+app = FastAPI(
+    title="Swarm Robotics Lab API",
+    openapi_url="/admin/openapi.json",
+    docs_url="/admin/docs",  # Cambiar la ruta de Swagger UI
+    redoc_url="/admin/redoc"  # Cambiar la ruta de ReDoc (opcional)
+)
+
 
 # Configuración de CORS
 origins = [
