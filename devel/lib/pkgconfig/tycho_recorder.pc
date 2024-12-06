@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/devel
+
+Name: tycho_recorder
+Description: Description of tycho_recorder
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

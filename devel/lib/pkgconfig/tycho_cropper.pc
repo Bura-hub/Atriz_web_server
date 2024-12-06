@@ -1,0 +1,8 @@
+prefix=/home/atriz/catkin_ws/devel
+
+Name: tycho_cropper
+Description: Description of tycho_cropper
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

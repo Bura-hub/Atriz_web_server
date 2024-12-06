@@ -1,0 +1,59 @@
+\subsubsection usage Usage
+\verbatim
+<node name="avt_vimba_camera" pkg="avt_vimba_camera" type="avt_vimba_camera">
+  <param name="acquisition_mode" type="str" value="Continuous" />
+  <param name="acquisition_rate" type="double" value="10.0" />
+  <param name="trigger_source" type="str" value="FixedRate" />
+  <param name="trigger_mode" type="str" value="On" />
+  <param name="trigger_selector" type="str" value="FrameStart" />
+  <param name="trigger_activation" type="str" value="RisingEdge" />
+  <param name="trigger_delay" type="double" value="0.0" />
+  <param name="action_device_key" type="int" value="1" />
+  <param name="action_group_key" type="int" value="1" />
+  <param name="action_group_mask" type="int" value="1" />
+  <param name="exposure" type="double" value="50000.0" />
+  <param name="exposure_auto" type="str" value="Continuous" />
+  <param name="exposure_auto_alg" type="str" value="FitRange" />
+  <param name="exposure_auto_tol" type="int" value="5" />
+  <param name="exposure_auto_max" type="int" value="50000" />
+  <param name="exposure_auto_min" type="int" value="45" />
+  <param name="exposure_auto_outliers" type="int" value="0" />
+  <param name="exposure_auto_rate" type="int" value="100" />
+  <param name="exposure_auto_target" type="int" value="50" />
+  <param name="gain" type="double" value="0.0" />
+  <param name="gain_auto" type="str" value="Continuous" />
+  <param name="gain_auto_adjust_tol" type="int" value="5" />
+  <param name="gain_auto_max" type="double" value="32.0" />
+  <param name="gain_auto_min" type="double" value="0.0" />
+  <param name="gain_auto_outliers" type="int" value="0" />
+  <param name="gain_auto_rate" type="int" value="50" />
+  <param name="gain_auto_target" type="int" value="50" />
+  <param name="balance_ratio_abs" type="double" value="1.0" />
+  <param name="balance_ratio_selector" type="str" value="Red" />
+  <param name="whitebalance_auto" type="str" value="Continuous" />
+  <param name="whitebalance_auto_tol" type="int" value="5" />
+  <param name="whitebalance_auto_rate" type="int" value="100" />
+  <param name="binning_x" type="int" value="1" />
+  <param name="binning_y" type="int" value="1" />
+  <param name="decimation_x" type="int" value="1" />
+  <param name="decimation_y" type="int" value="1" />
+  <param name="width" type="int" value="4096" />
+  <param name="height" type="int" value="4096" />
+  <param name="offset_x" type="int" value="0" />
+  <param name="offset_y" type="int" value="0" />
+  <param name="pixel_format" type="str" value="Mono8" />
+  <param name="stream_bytes_per_second" type="int" value="124000000" />
+  <param name="ptp_mode" type="str" value="Off" />
+  <param name="sync_in_selector" type="str" value="SyncIn1" />
+  <param name="sync_out_polarity" type="str" value="Normal" />
+  <param name="sync_out_selector" type="str" value="SyncOut1" />
+  <param name="sync_out_source" type="str" value="GPO" />
+  <param name="line_selector" type="str" value="Line0" />
+  <param name="line_mode" type="str" value="Input" />
+  <param name="iris_auto_target" type="int" value="50" />
+  <param name="iris_mode" type="str" value="Continuous" />
+  <param name="iris_video_level_min" type="int" value="110" />
+  <param name="iris_video_level_max" type="int" value="110" />
+</node>
+\endverbatim
+
