@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
-from app.crud.scripts import upload_script
+from fastapi import APIRouter, HTTPException, Depends, Form, UploadFile, File
 from app.ros_bridge import send_code_to_ros
+import os
+import subprocess
 
 router = APIRouter()
 
@@ -16,17 +17,24 @@ async def upload_new_script(file: UploadFile = File(...), robot_ip: str = Form(.
     Returns:
         dict: Resultado de la ejecución del script.
     """
+    user = os.getenv("SSH_USER", "sphero")  # Usa el usuario predeterminado
+    temp_file_path = "/tmp/script.py"  # Ruta temporal en la Raspberry Pi
+
     try:
         # Leer el contenido del archivo
         content = await file.read()
         script_content = content.decode()
 
-        # Subir el script al sistema de almacenamiento (opcional)
-        upload_script(script_content)
+        # Guardar el contenido en un archivo temporal en la Raspberry Pi
+        with open(temp_file_path, 'wb') as f:
+            f.write(content)
 
-        # Enviar el script al robot y ejecutarlo
-        execution_result = send_code_to_ros(script_content, robot_ip)
-        
+        # Cambiar permisos para hacer el script ejecutable
+        subprocess.run(["ssh", f"{user}@{robot_ip}", f"chmod +x {temp_file_path}"])
+
+        # Ejecutar el script en la Raspberry Pi
+        execution_result = send_code_to_ros(temp_file_path, robot_ip, user)
+
         return {"status": "success", "result": execution_result}
 
     except Exception as e:

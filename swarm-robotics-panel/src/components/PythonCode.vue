@@ -21,11 +21,23 @@
       </pre>
     </section>
 
-    <!-- Botón para subir script -->
+    <!-- Input para la IP del robot -->
+    <div class="mb-4">
+      <label class="block mb-2">IP del Robot</label>
+      <input v-model="robotIp" type="text" placeholder="Ej: 192.168.1.100" required class="bg-gray-700 w-full p-2 rounded-md border border-gray-600" />
+    </div>
+
+    <!-- Botón para subir y ejecutar script -->
     <section class="space-y-2">
-      <button @click="uploadScript" class="bg-blue-500 p-2 rounded-md w-full">
-        Upload Script
+      <button @click="uploadAndExecuteScript" class="bg-blue-500 p-2 rounded-md w-full">
+        Subir y Ejecutar Script
       </button>
+    </section>
+
+    <!-- Mostrar resultado de la ejecución -->
+    <section v-if="commandOutput" class="output-block mt-4">
+      <h3 class="text-xl">Salida del Script:</h3>
+      <pre class="bg-gray-700 p-4 rounded-md text-white">{{ commandOutput }}</pre>
     </section>
   </section>
 </template>
@@ -41,30 +53,35 @@ export default {
     return {
       editableCode: '',
       highlightedCode: '',
+      robotIp: '',
+      commandOutput: '',
     };
   },
   methods: {
-    uploadScript() {
-      // Simular selección de archivo (esto puede abrir el diálogo de archivos del navegador)
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.py'; // Aceptar solo archivos Python
-      input.click(); // Simular el clic para abrir el selector de archivos
-
-      input.onchange = (event) => {
-        const selectedFile = event.target.files[0];
-        if (selectedFile) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.editableCode = e.target.result;
-            this.updateCode(); // Resaltar el código cargado
-          };
-          reader.readAsText(selectedFile);
-        }
-      };
-    },
     updateCode() {
       this.highlightedCode = Prism.highlight(this.editableCode, Prism.languages.python, 'python');
+    },
+    async uploadAndExecuteScript() {
+      const blob = new Blob([this.editableCode], { type: 'text/plain' });
+      const formData = new FormData();
+      formData.append('file', blob, 'script.py'); // Nombramos el archivo como 'script.py'
+      formData.append('robot_ip', this.robotIp);
+
+      try {
+        const response = await fetch('/api/scripts/upload/', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          this.commandOutput = data.result;
+        } else {
+          this.commandOutput = data.detail || 'Error desconocido';
+        }
+      } catch (error) {
+        console.error('Error al subir y ejecutar el script:', error);
+      }
     }
   },
   watch: {
@@ -90,5 +107,10 @@ code[class*="language-"], pre[class*="language-"] {
   color: #ffffff;
   padding: 15px;
   background-color: #00000000; /* Fondo gris oscuro */
+}
+
+.output-block {
+  background-color: #1a1a1a; /* Fondo oscuro para la salida */
+  border-radius: 8px;
 }
 </style>

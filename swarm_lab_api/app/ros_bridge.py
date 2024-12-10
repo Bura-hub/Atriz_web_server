@@ -1,42 +1,31 @@
-import os
 import subprocess
 
-def send_code_to_ros(code, robot_ip):
+def send_code_to_ros(script_path: str, robot_ip: str, user: str):
     """
-    Envía código Python a una Raspberry Pi remota que ejecuta un nodo ROS.
-    
+    Envía un script Python a la Raspberry Pi y lo ejecuta.
+
     Args:
-        code (str): El código Python a ejecutar.
-        robot_ip (str): Dirección IP del robot (Raspberry Pi).
-    
+        script_path (str): La ruta del script a ejecutar.
+        robot_ip (str): La dirección IP del robot (Raspberry Pi).
+        user (str): El usuario SSH.
+
     Returns:
-        str: Resultado de la ejecución o error.
+        str: La salida de la ejecución del script.
+    
+    Raises:
+        Exception: Si ocurre un error al ejecutar el script.
     """
     try:
-        # Guardar el código en un archivo temporal local
-        local_script_path = "/tmp/user_script.py"
-        with open(local_script_path, "w") as f:
-            f.write(code)
+        # Comando que incluye el sourcing de ROS y la ejecución del script
+        ssh_command = ["ssh", f"{user}@{robot_ip}", f"source /opt/ros/noetic/setup.bash; python3 {script_path}"]
 
-        # Transferir el script a la Raspberry Pi usando scp
-        remote_script_path = f"{robot_ip}:/tmp/user_script.py"
-        scp_command = ["scp", local_script_path, remote_script_path]
-        scp_result = subprocess.run(scp_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if scp_result.returncode != 0:
-            raise Exception(f"Error al transferir script: {scp_result.stderr.decode()}")
-
-        # Ejecutar el script en la Raspberry Pi usando ssh y rosrun
-        ssh_command = [
-            "ssh", robot_ip,
-            "rosrun sphero_rvr_pkg script_executor.py /tmp/user_script.py"
-        ]
-        ssh_result = subprocess.run(ssh_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if ssh_result.returncode != 0:
-            raise Exception(f"Error al ejecutar el script en ROS: {ssh_result.stderr.decode()}")
-
-        return ssh_result.stdout.decode()
+        # Ejecutar el comando
+        result = subprocess.run(ssh_command, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            raise Exception(f"Error en la ejecución del script: {result.stderr}")
+        
+        return result.stdout
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        raise Exception(f"Error al enviar el script al robot: {str(e)}")
