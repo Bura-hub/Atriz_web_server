@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-800 p-6 mt-6 rounded-lg">
-    <h2 class="text-xl md:text-2xl mb-4">Live Video Stream</h2>
+    <h2 class="text-xl md:text-2xl mb-4">Transmisión de vídeo en vivo</h2>
     <div class="video-container mx-auto" ref="videoContainer">
       <img id="videoStream" :src="videoStreamSrc" alt="ROS Video Stream" />
       <button @click="toggleFullscreen" class="fullscreen-btn">

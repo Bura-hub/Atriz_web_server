@@ -19,8 +19,8 @@
 
       <!-- Sección para ejecutar comandos en la Raspberry Pi -->
       <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <PythonCode />
-        <ExecuteCommand /> <!-- Aquí integramos el componente de ejecución de comandos -->
+        <PythonCode /> <!-- Componente actualizado de PythonCode -->
+        <ExecuteCommand />
       </section>
 
       <!-- Código Python y Resultados de Experimentos -->
@@ -40,7 +40,7 @@ import BatterySensorData from './BatterySensorData.vue';
 import PythonCode from './PythonCode.vue';
 import ExperimentResults from './ExperimentResults.vue';
 import AppFooter from './AppFooter.vue';
-import ExecuteCommand from './ExecuteCommand.vue'; // Importa el nuevo componente
+import ExecuteCommand from './ExecuteCommand.vue';
 
 export default {
   name: 'MainDashboard',
@@ -52,7 +52,7 @@ export default {
     PythonCode,
     ExperimentResults,
     AppFooter,
-    ExecuteCommand // Registra el nuevo componente
+    ExecuteCommand
   },
   data() {
     return {

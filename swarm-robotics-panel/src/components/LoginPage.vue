@@ -2,17 +2,17 @@
   <div class="login-wrapper">
     <div class="login-container">
       <h1 class="app-title">Atriz RVR</h1>
-      <h2>Sign In</h2>
+      <h2>Inicio de Sesión</h2>
       <form @submit.prevent="login">
         <div class="input-group">
-          <label for="username">Username</label>
+          <label for="username">Nombre de Usuario</label>
           <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
         </div>
         <div class="input-group">
-          <label for="password">Password</label>
+          <label for="password">Contraseña</label>
           <input type="password" id="password" v-model="password" placeholder="Enter your password" required />
         </div>
-        <button type="submit" class="btn">Login</button>
+        <button type="submit" class="btn">Acceder</button>
         <div v-if="error" class="error-message">
           {{ error }}
         </div>

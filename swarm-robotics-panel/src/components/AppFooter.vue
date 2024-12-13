@@ -1,7 +1,7 @@
 <template>
   <footer class="bg-gray-800 p-6 mt-6 rounded-lg flex flex-col md:flex-row justify-between items-center">
     <div class="text-center md:text-left">
-      <p class="text-lg">Timer:</p>
+      <p class="text-lg">Hora Local:</p>
       <p class="text-2xl font-bold">{{ timer }}</p>
     </div>
     <div class="mt-4 md:mt-0">

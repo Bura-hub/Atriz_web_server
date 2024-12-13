@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import experiments, robots, users, updates, scripts
+from app.api import experiments, robots, users, updates, scripts, files
 from app.db.session import engine, Base
 from app.models import experiment, robot, user
 from app.dependencies import get_current_user  # Dependencia para la autenticación basada en JWT
@@ -42,3 +42,4 @@ app.include_router(robots.router, prefix="/api", tags=["Robots"])
 app.include_router(updates.router, prefix="/api", tags=["Updates"])
 app.include_router(users.router, prefix="/api", tags=["Users"])
 app.include_router(scripts.router, prefix="/api", tags=["Scripts"])
+app.include_router(files.router, prefix="/api", tags=["Files"])

@@ -1,8 +1,8 @@
 <template>
     <div class="bg-gray-800 p-6 rounded-lg">
-      <h2 class="text-xl md:text-2xl mb-4">Battery & Sensor Data</h2>
+      <h2 class="text-xl md:text-2xl mb-4">Datos de batería y sensores</h2>
       <div class="mb-4">
-        <p class="mb-2">Battery Level</p>
+        <p class="mb-2">Nivel de Batería</p>
         <div class="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
           <div class="bg-blue-500 h-full" :style="{ width: batteryLevel + '%' }"></div>
         </div>
