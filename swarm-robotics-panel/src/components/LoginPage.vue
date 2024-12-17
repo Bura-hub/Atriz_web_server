@@ -6,11 +6,11 @@
       <form @submit.prevent="login">
         <div class="input-group">
           <label for="username">Nombre de Usuario</label>
-          <input type="text" id="username" v-model="username" placeholder="Enter your username" required />
+          <input type="text" id="username" v-model="username" placeholder="Introduzca su Usuario" required />
         </div>
         <div class="input-group">
           <label for="password">Contraseña</label>
-          <input type="password" id="password" v-model="password" placeholder="Enter your password" required />
+          <input type="password" id="password" v-model="password" placeholder="Introduzca su Contraseña" required />
         </div>
         <button type="submit" class="btn">Acceder</button>
         <div v-if="error" class="error-message">
