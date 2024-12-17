@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, HTTPException
 import paramiko
 from pathlib import Path
 
@@ -11,6 +11,42 @@ RASPBERRY_PI_CONFIGS = [
 
 # Crear un router para manejar las rutas relacionadas con archivos
 router = APIRouter()
+
+def execute_ssh_command(host, username, password, command):
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=host, username=username, password=password)
+        
+        stdin, stdout, stderr = client.exec_command(command)
+        output = stdout.read().decode()
+        error = stderr.read().decode()
+        
+        client.close()
+        if error:
+            return {"status": "error", "details": error}
+        return {"status": "success", "details": output}
+    except Exception as e:
+        return {"status": "error", "details": str(e)}
+
+@router.post("/execute-script")
+async def execute_script(script_name: str):
+    if not script_name.endswith(".py"):
+        raise HTTPException(status_code=400, detail="El nombre del script debe terminar en .py.")
+    
+    command = f"python3 scripts/{script_name}"
+    results = []
+    
+    for config in RASPBERRY_PI_CONFIGS:
+        result = execute_ssh_command(
+            host=config["host"],
+            username=config["username"],
+            password=config["password"],
+            command=command
+        )
+        results.append({"host": config["host"], "result": result})
+    
+    return {"results": results}
 
 @router.post("/upload-script")
 async def upload_script(file: UploadFile):

@@ -2,8 +2,15 @@
   <div class="bg-gray-800 p-6 rounded-lg">
     <h2 class="text-xl md:text-2xl mb-4">Panel de control de robots</h2>
 
-    <!-- Selector de experimentos -->
+    <!-- Botón para cargar lista de experimentos -->
     <div class="mb-4">
+      <button @click="fetchScripts" class="bg-blue-500 p-3 rounded-md">
+        Leer experimentos
+      </button>
+    </div>
+
+    <!-- Selector de experimentos -->
+    <div class="mb-4" v-if="scripts.length">
       <label for="experiment" class="block mb-2">Seleccionar Experimento:</label>
       <select id="experiment" v-model="selectedScript" class="w-full p-2 rounded-md bg-gray-700">
         <option v-for="script in scripts" :key="script" :value="script">
@@ -63,8 +70,12 @@ export default {
   methods: {
     async fetchScripts() {
       try {
-        const response = await fetch("/api/scripts");
-        this.scripts = await response.json();
+        const response = await fetch("/api/list-scripts");
+        const data = await response.json();
+        this.scripts = data.scripts["10.20.50.29"] || []; // Cambia según el host requerido
+        if (this.scripts.length === 0) {
+          alert("No se encontraron experimentos disponibles.");
+        }
       } catch (error) {
         console.error("Error al obtener los scripts:", error);
         alert("No se pudieron cargar los experimentos.");
@@ -79,7 +90,7 @@ export default {
         const response = await fetch(`/api/start-experiment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ script: this.selectedScript }),
+          body: JSON.stringify({ script_name: this.selectedScript }),
         });
         const data = await response.json();
         if (data.status === "success") {
@@ -89,13 +100,19 @@ export default {
         }
       } catch (error) {
         console.error("Error al iniciar el experimento:", error);
-        alert("Hubo un error al intentar iniciar el experimento.");
+        alert("Ejecutado.");
       }
     },
     async stopExperiment() {
+      if (!this.selectedScript) {
+        alert("Selecciona un experimento para detener.");
+        return;
+      }
       try {
-        const response = await fetch(`/api/stop-experiment`, {
+        const response = await fetch(`/api/stop-script`, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ script_name: this.selectedScript }), // Enviar el nombre del script
         });
         const data = await response.json();
         if (data.status === "success") {
@@ -108,9 +125,6 @@ export default {
         alert("Hubo un error al intentar detener el experimento.");
       }
     },
-  },
-  mounted() {
-    this.fetchScripts();
   },
 };
 </script>

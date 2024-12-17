@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Form, UploadFile, File
+from app.core.ssh_utils import list_scripts_in_all_pis, execute_script_in_all_pis
 from app.ros_bridge import send_code_to_ros
 import os
 import subprocess
@@ -39,3 +40,22 @@ async def upload_new_script(file: UploadFile = File(...), robot_ip: str = Form(.
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al ejecutar el script: {str(e)}")
+
+@router.post("/execute-script")
+async def execute_script(script_name: str):
+    """
+    Endpoint para ejecutar un script Python en todas las Raspberry Pi.
+    :param script_name: Nombre del script a ejecutar.
+    :return: Resultado de la ejecución del script en las Raspberry Pi.
+    """
+    results = execute_script_in_all_pis(script_name)
+    return {"execution_results": results}
+
+@router.get("/list-scripts")
+async def list_scripts():
+    """
+    Endpoint para listar los scripts Python en el directorio remoto de todas las Raspberry Pi.
+    :return: Diccionario con los scripts disponibles en cada Raspberry Pi.
+    """
+    scripts = list_scripts_in_all_pis()
+    return {"scripts": scripts}
