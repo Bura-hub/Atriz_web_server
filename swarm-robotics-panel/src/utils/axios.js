@@ -18,6 +18,19 @@ instance.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
+// Interceptor de respuesta: 401 → cerrar sesión y redirigir a login
+instance.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('full_name');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Función para enviar datos de formulario
 instance.postForm = (url, data) => {
   return instance.post(url, data, {

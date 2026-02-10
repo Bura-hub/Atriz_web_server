@@ -1,0 +1,792 @@
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{csquotes}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip} % Elimina sangría y agrega espacio entre párrafos
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{Bibliografia.bib} % <-- tu archivo .bib
+
+% Figuras en la posición exacta del texto (no flotantes)
+\floatplacement{figure}{H}
+\usepackage{tcolorbox}
+\usepackage{xurl} % mejor que url para cortes
+\usepackage{hyperref} % recomendable si quieres enlaces clicables
+
+% --- Profundidad de numeración y tabla de contenidos ---
+\setcounter{secnumdepth}{5}  % Numera hasta subparagraph (5 niveles)
+\setcounter{tocdepth}{3}     % Muestra en índices hasta subsubsection (3 niveles)
+
+% --- Redefinir "Cuadro" como "Tabla" para babel español ---
+\addto\captionsspanish{%
+  \def\tablename{Tabla}%
+}
+\AtBeginDocument{%
+  \renewcommand{\tablename}{Tabla}%
+}
+
+% --- Numeración jerárquica de figuras y tablas por sección ---
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+% --- Colores personalizados ---
+\definecolor{darkblue}{rgb}{0.1, 0.2, 0.4}
+\definecolor{sectioncolor}{rgb}{0.15, 0.35, 0.65}
+\definecolor{codegray}{rgb}{0.96, 0.96, 0.96}
+\definecolor{codeblue}{rgb}{0.25, 0.41, 0.88}
+\definecolor{codegreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{warningcolor}{rgb}{0.8, 0.4, 0.0}
+\definecolor{successcolor}{rgb}{0.0, 0.6, 0.0}
+\definecolor{infocolor}{rgb}{0.0, 0.4, 0.8}
+
+% --- Encabezado y pie de página ---
+\pagestyle{fancy}
+\fancyhead[L]{\textbf{\textcolor{darkblue}{Documento de desarrollo}}}
+\fancyhead[R]{\textbf{\textcolor{darkblue}{Plataforma Atriz}}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Estilo de página para inicio de capítulo (sin encabezado)
+\fancypagestyle{chapterpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+}
+
+% Estilo de página para índices (sin encabezado ni líneas)
+\fancypagestyle{indexpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% --- Hipervínculos (evitar comandos en bookmarks PDF) ---
+\pdfstringdefDisableCommands{%
+  \def\code#1{#1}%
+  \def\file#1{#1}%
+}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    urlcolor=darkblue,
+    pdftitle={Documento de desarrollo - Plataforma Atriz},
+    pdfauthor={},
+    hypertexnames=false
+}
+
+% --- Estilo de títulos (negro, negrita) ---
+\titleformat{\section}[display]
+  {\normalfont\Large\bfseries}
+  {\vspace*{1cm}\huge Capítulo \thesection}
+  {20pt}
+  {\Huge\bfseries}
+  [\thispagestyle{chapterpage}]
+\titlespacing*{\section}
+  {0pt}{0pt}{40pt}
+
+\titleformat{\subsection}
+  {\Large\bfseries}{\thesubsection}{1em}{}[\justifying]
+\titlespacing*{\subsection}
+  {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries}{\thesubsubsection}{1em}{}[\justifying]
+\titlespacing*{\subsubsection}
+  {0pt}{3ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\paragraph}
+  {\normalsize\bfseries}{\theparagraph}{1em}{}[\justifying]
+\titlespacing*{\paragraph}
+  {0pt}{2.5ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+\titleformat{\subparagraph}
+  {\normalsize\itshape\bfseries}{\thesubparagraph}{1em}{}[\justifying]
+\titlespacing*{\subparagraph}
+  {0pt}{2ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+% --- Configuración del listado de código ---
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codegreen},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  language=Python,
+  inputencoding=utf8,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+% --- Espaciado entre líneas ---
+\onehalfspacing
+\setlength{\headheight}{16pt}
+
+% --- Comandos personalizados ---
+\newcommand{\warning}[1]{\textcolor{warningcolor}{\textbf{ADVERTENCIA:} #1}}
+\newcommand{\tip}[1]{\textcolor{successcolor}{\textbf{CONSEJO:} #1}}
+\newcommand{\info}[1]{\textcolor{infocolor}{\textbf{INFORMACIÓN:} #1}}
+% Código y nombres de archivo: estilo técnico (monoespaciado + color)
+% \newcommand{\code}[1]{\textcolor{codeblue}{\texttt{\small#1}}}
+\newcommand{\code}[1]{\textcolor{codeblue}{\url{#1}}}
+% \newcommand{\file}[1]{\textcolor{darkblue}{\texttt{#1}}}
+\newcommand{\file}[1]{\textcolor{darkblue}{\url{#1}}}
+
+% --- Cajas de información ---
+\newtcolorbox{infobox}{
+    colback=infocolor!10,
+    colframe=infocolor,
+    coltitle=infocolor,
+    title=\textbf{Información Técnica},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{warningbox}{
+    colback=warningcolor!10,
+    colframe=warningcolor,
+    coltitle=warningcolor,
+    title=\textbf{Consideración Importante},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{tipbox}{
+    colback=successcolor!10,
+    colframe=successcolor,
+    coltitle=successcolor,
+    title=\textbf{Nota Técnica},
+    fonttitle=\bfseries
+}
+
+\begin{document}
+\sloppy
+\setstretch{0.95}
+\justifying
+
+% --- PORTADA PERSONALIZADA ---
+\thispagestyle{empty}
+\begin{titlepage}
+    \centering
+    \vspace*{0.1cm}
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+    {\Large\textbf{DOCUMENTO DE DESARROLLO}}\\[0.5cm]
+    {\Large\textbf{Software del Laboratorio de Robótica de Enjambres}}\\[0.5cm]
+    {\Large\textbf{de la Universidad de Nariño}}\\[0.5cm]
+    {\huge\textbf{SW-LRE-Udenar}}\\[0.5cm]
+    \includegraphics[width=0.5\textwidth]{images/Logos.png}\\[0.5cm]
+    \vfill
+    %{\normalsize Autores:}\\[0.2cm]
+    \large{\textbf{Brayan Stiven López-Méndez}}\\
+    \url{bsmendez24B@udenar.edu.co}\\
+    Ing. Electrónico - Estudiante Maestría en Ingeniería Electrónica\\
+    Universidad de Nariño\\
+    \vfill
+    \large{\textbf{Wilson Olmedo Achicanoy-Martínez, PhD.}}\\
+    \url{wilachic@udenar.edu.co}\\
+    Docente Tiempo Completo - Departamento de Electrónica\\
+    Universidad de Nariño
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+\end{titlepage}
+
+% --- ÍNDICES ---
+\newpage
+\renewcommand{\contentsname}{\Huge\textbf{Índice general}\vspace{-0.1cm}}
+
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\hypersetup{linkcolor=black}%
+\tableofcontents
+\hypersetup{linkcolor=darkblue}%
+\newpage
+
+\thispagestyle{fancy}
+\mbox{}
+\newpage
+
+\newcommand{\sectionbreak}{\clearpage}
+
+
+% =======================
+\section{Agradecimientos}
+\justifying
+
+Los autores agradecen a la Universidad de Nariño y en especial a la Vicerrectoría de Investigaciones e Interacción Social (VIIS) \cite{Udenar_VIIS_Web}, por el apoyo económico y administrativo brindado para el desarrollo del Laboratorio de Robótica de Enjambres (LRE-UDENAR), en el contexto de la ejecución del proyecto N.\textsuperscript{o} 2703 ``Desarrollo de un laboratorio remoto y abierto en la línea de robótica de enjambres para la Universidad de Nariño'' de la Convocatoria Docente 2022.
+
+De igual manera, agradecen todo el apoyo académico y dedicación de los investigadores externos y de los investigadores de los programas de Ingeniería Electrónica y Maestría en Ingeniería Electrónica del Departamento de Electrónica y que pertenecen al Grupo de Investigación en Ingeniería Eléctrica y Electrónica (GIIEE) de la Universidad de Nariño.
+
+
+% =======================
+\section{Introducción}
+\justifying
+
+El desarrollo de sistemas robóticos complejos en el ámbito académico y de investigación enfrenta una barrera de entrada significativa correspondiente a la dicotomía presente entre la operación de bajo nivel, que exige un conocimiento no simple de hardware y sistemas operativos, y la necesidad de interfaces de alto nivel accesibles para la experimentación científica y educativa. El presente Documento de Desarrollo consolida la especificación técnica y las decisiones de diseño e implementación para la construcción del software del Laboratorio de Robótica de Enjambres de la Universidad de Nariño (LRE-Udenar), dirigido principalmente a desarrolladores. El documento unifica el análisis técnico del \textit{driver} ROS (\textit{Robot Operating System}) \cite{ROSWebsite} para el robot tipo Sphero RVR \cite{Sphero_RVR_Plus} con la arquitectura y la implementación del servidor web (\textit{frontend} Vue.js \cite{VueJS_Website} y \textit{backend} FastAPI \cite{FastAPI_Docs}), proporcionando una visión del ciclo de vida del dato, desde la adquisición sensorial en el borde (\textit{edge computing}) \cite{Shi2016EdgeVision} hasta su visualización en una interfaz de usuario reactiva.
+
+Es necesario establecer la distinción clara que existe entre las capacidades de una interfaz web y las realidades físicas de la latencia de red y del procesamiento en el borde. Este documento aclara que se describe el desarrollo de la solución software sin comprometer el requerimiento del laboratorio en el sentido de aproximarse al ``tiempo real'' y ``plug-and-play'' que se necesita para una correcta operación. De este modo, se presenta un análisis técnico riguroso que expone las limitaciones del \textit{streaming} MJPEG (\textit{Motion JPEG}) sobre HTTP (\textit{Hypertext Transfer Protocol}) \cite{RFC9110_HTTP_Semantics}, los cuellos de botella en la ejecución de \textit{scripts} vía SSH (\textit{Secure Shell}) \cite{RFC4251_SSH_Architecture} y las dependencias críticas de hardware (Sphero RVR, Raspberry Pi \cite{RaspberryPi_Website}). La comprensión de cómo los componentes negocian la transferencia de datos y comandos es esencial para mantener, escalar o replicar la plataforma del laboratorio.
+
+
+\subsection{Objetivo y alcance}
+
+El objetivo del documento es servir como referencia de desarrollo para entender el funcionamiento del laboratorio desde arquitectura de componentes, estrategias de concurrencia, API (\textit{Application Programming Interface}) \cite{FastAPI_Docs}, flujos de datos, configuración y criterios de validación. A diferencia de ser una guía de inicio rápido, este documento profundiza en la ingeniería usada para permitir despliegue reproducible, mantenimiento proactivo (identificación de puntos comunes de fallo) y desarrollo evolutivo (base para migrar componentes legados). El alcance abarca:
+
+\begin{itemize}
+    \item \textbf{Driver ROS (atriz\_rvr\_driver):} Diseño en capas, integración asyncio--rospy, conversión cinemática, tópicos y servicios, mensajes personalizados (\code{atriz\_rvr\_msgs}), metodología ROS-XP y pruebas.
+    \item \textbf{Servidor web (Atriz Web Server):} Backend FastAPI (API REST, \file{ros\_bridge.py}, autenticación JWT), frontend Vue.js~3 (SPA, guards, visualización MJPEG), integración con ROS en los robots (SSH/SCP, \code{script\_executor}).
+    \item \textbf{Integración end-to-end:} Flujo desde la interfaz web hasta la ejecución de código en el RVR y la publicación de sensores.
+\end{itemize}
+
+
+\subsection{Definición del problema y justificación}
+
+La robótica móvil empleada en el laboratorio con la plataforma Sphero RVR presenta desafíos de integración. Aunque el hardware del RVR ofrece una plataforma mecánica robusta con capacidades de expansión mediante puertos UART, su integración con ROS estándar no es simple, debido a que el SDK (\textit{Software Development Kit}) \cite{AWS_WhatIs_SDK} oficial del RVR está basado en Python y \textbf{asyncio}, mientras que el middleware ROS 1 (\code{rospy}) opera de forma \textbf{síncrona y multihilo}. Entonces, los bucles de eventos (\emph{event loops}) de las librerías modernas de E/S asíncrona entran en conflicto directo con el modelo de ejecución de ROS; por lo tanto, se requiere de una arquitectura de ``puente'' o ``adaptador'' que reconcilie ambos paradigmas.
+
+Simultáneamente, la gestión de múltiples agentes robóticos en un laboratorio requiere una capa de supervisión que va más allá de una simple consola de comandos. La ejecución de experimentos de robótica de enjambre implica la carga simultánea de código, la sincronización de inicio y parada y la monitorización de telemetría de múltiples robots. Realizar estas tareas manualmente mediante terminales Linux causa errores humanos, es ineficiente y difícil de replicar. Por ello, se justifica el desarrollo de un \textbf{orquestador de enjambre} (servidor web) que centralice el control y garantice la integridad de los datos experimentales mediante bases de datos relacionales y autenticación segura.
+
+
+\subsection{Objetivos técnicos del desarrollo}
+
+El software se rige por los siguientes objetivos técnicos: (1) \textbf{Integración de concurrencia híbrida:} desarrollar un nodo ROS capaz de reconciliar el modelo de ejecución síncrono de \code{rospy} con el modelo asíncrono del SDK de Sphero, de modo que el bloqueo de uno no afecte la latencia del otro; (2) \textbf{Abstracción cinemática:} implementar modelos matemáticos de cinemática inversa diferencial para traducir comandos de velocidad estandarizados (en unidades del SI m/s y rad/s) a las unidades de control nativas del firmware del RVR (registros de 8 bits: 0--255); (3) \textbf{Arquitectura web desacoplada:} diseñar una plataforma siguiendo el patrón de separación de preocupaciones SoC (\textit{Separation of Concerns}) \cite{Dijkstra1974EWD447}, con \textit{frontend} reactivo y \textit{backend} de alto rendimiento comunicados exclusivamente por contratos API REST \cite{OpenAPI_Spec}; (4) \textbf{Seguridad operacional y lógica:} establecer mecanismos en capas, desde la autenticación JWT en la capa web hasta \emph{watchdogs} y bucles de latido (\emph{heartbeat}) en el driver para prevenir comportamientos erráticos ante pérdidas de conexión.
+
+
+\subsection{Público y documentación complementaria}
+
+El documento está dirigido a un perfil técnico avanzado como ingenieros electrónicos, de software, roboticistas y administradores de sistemas. Se asume familiaridad con entornos Linux (gestión de paquetes, servicios), desarrollo web (ciclo de vida de una petición HTTP, modelo cliente-servidor) y nociones de robótica (odometría, cinemática diferencial, sensores). Para el despliegue del servidor se requieren además conocimientos de PostgreSQL \cite{PostgreSQL_Website}, Nginx \cite{Nginx_Website}  y variables de entorno.
+
+\begin{tipbox}
+\textbf{Documentación relacionada:}\\
+Para la \emph{operación} del software del laboratorio (acceso, pantallas, uso de la API desde la interfaz) véase el Manual de Usuario del Software del Laboratorio de Robótica de Enjambres de la Universidad de Nariño. Para el \emph{análisis técnico detallado} del driver RVR (protocolo Sphero, máquina de estados, checksum, riesgos) véase el documento DRIVER ROS PARA SPHERO.
+\end{tipbox}
+
+
+% =======================
+\section{Visión del laboratorio}
+\justifying
+
+El laboratorio surge como una solución de ingeniería diseñada para cerrar la brecha técnica existente entre el control de bajo nivel de plataformas robóticas móviles y las interfaces de usuario de alto nivel requeridas para la investigación académica y la experimentación educativa. En el contexto de la robótica de enjambre, la complejidad inherente a la gestión simultánea de múltiples agentes impone barreras significativas, en el sentido de que los investigadores deben dominar comandos de terminal Linux, protocolos de red SSH y la arquitectura de grafos del Sistema Operativo de Robots (ROS), antes de planear y ejecutar un solo experimento. El software del laboratorio aborda esta problemática abstrayendo las complejidades detrás de una arquitectura web unificada, permitiendo la carga de código, la ejecución de rutinas y la visualización de telemetría a través de un navegador web estándar.
+
+El laboratorio ha sido diseñado para operar en una \textbf{arquitectura distribuida} donde la computación de bajo nivel y la abstracción de hardware residen en el robot (Raspberry Pi + Sphero RVR), mientras que la orquestación, la autenticación y la gestión de experimentos se centralizan en un servidor de aplicaciones. El software de gestión del laboratorio no es solo un panel de control; por el contrario, es un \textbf{orquestador de middleware} \cite{IBM_WhatIs_Middleware} que integra tecnologías dispares de un \textit{frontend} reactivo basado en Vue.js~3, un \textit{backend} construido sobre FastAPI (Python) y una capa de abstracción de hardware gestionada por ROS Noetic en Raspberry Pi con Sphero RVR. La relevancia del software propuesto radica en su capacidad para abstraer la complejidad del middleware ROS y los protocolos de comunicación serial asíncrona, exponiendo capacidades robóticas a través de una API RESTful estandarizada, permitiendo que investigadores y estudiantes interactúen con grupos de robots sin gestionar manualmente conexiones SSH, túneles de red o enfrentar la complejidad de paquetes de catkin \cite{ROSWebsite}.
+
+
+\subsection{Componentes de alto nivel}
+
+El sistema se compone de tres nodos lógicos principales que interactúan por TCP/IP:
+
+\begin{itemize}
+    \item \textbf{Cliente (navegador)}.  Logrado mediante el \textit{framework} Vue.js~3 y la biblioteca Axios para renderizado de la interfaz, gestión de estado, visualización de vídeo MJPEG y consumo del \textit{stream} MJPEG mediante HTTPS.
+    \item \textbf{Servidor de aplicación:} Logrado con FastAPI (Python~3.8+) y Uvicorn, para hacer la autenticación JWT, lógica de negocio, orquestación de \textit{scripts} vía SSH/SCP, mediante HTTP/1.1, SSHv2 y SQL sobre TCP.
+    \item \textbf{Agente robótico (RVR):} Logrado con ROS Noetic sobre Ubuntu Server en Raspberry Pi, mediante un driver que traduce tópicos ROS a UART con el Sphero RVR, como \code{usb\_cam}, \code{web\_video\_server} y ejecutor de scripts TCPROS/UDPROS, SSH, serial UART.
+\end{itemize}
+
+
+\subsection{Flujo de datos típico}
+
+Para realizar una acción como ``mover robot'' o ``ejecutar script'' el operador actúa en la interfaz Vue.js y el navegador envía un \code{POST} a la API. FastAPI valida el token JWT y los permisos en PostgreSQL. El \textit{backend} no habla ROS directamente, por lo que invoca un subproceso que establece un túnel SSH con el robot. En la Raspberry Pi se ejecuta \code{rosrun sphero\_rvr\_pkg script\_executor.py} o se publica en un tópico. El nodo ROS traduce la orden a comandos UART para el RVR. El \textit{feedback} (odometría, sensores) se lee de forma asíncrona o se visualiza vía cámara. La latencia total es la suma de la latencia HTTP, la de establecimiento SSH (si no es persistente) y la latencia interna de ROS.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{images/fig_vision_sistema.png}
+\caption{Visión del laboratorio. Tres nodos lógicos (Cliente, Servidor de aplicación, Agente robótico RVR) y flujo de datos entre ellos (HTTP/HTTPS, SSH/SCP, TCPROS/UDPROS, UART). Fuente: elaboración propia.}
+\label{fig:vision_sistema}
+\end{figure}
+
+
+\subsection{Fundamentos teóricos}
+
+\subsubsection{ROS Noetic frente a ROS 2}
+
+ROS Noetic se ha elegido por la madurez y estabilidad de su ecosistema, que contiene documentación amplia, abundancia de paquetes de navegación y \textit{drivers} heredados, y soporte comunitario que reduce los riesgos en entornos académicos. ROS 2 ofrece mejor integración nativa con asyncio y mejores garantías de tiempo real, pero su ecosistema está aún en maduración. El \textit{driver} actúa como un nodo que publica tópicos de sensores (\code{/odom}, \code{/imu}) y se suscribe a \code{/cmd\_vel}. La biblioteca \code{rospy} fue diseñada antes de la adopción masiva de asyncio en Python 3, lo que obliga a implementar patrones de ``puente'' entre ambos mundos.
+
+
+\subsubsection{Bucles de eventos y concurrencia}
+
+El SDK del Sphero RVR para Raspberry Pi está construido sobre \textbf{asyncio}, que es una biblioteca de Python para escribir código concurrente utilizando la sintaxis \code{async/await}. Este modelo es adecuado para operaciones limitadas por E/S, como la comunicación serial UART, donde el procesador pasaría la mayor parte del tiempo esperando respuestas del hardware. En una arquitectura asíncrona, un ``bucle de eventos'' gestiona y programa la ejecución de múltiples corrutinas. Cuando una corrutina espera una operación externa (p.\ ej.\ un byte entrando por el puerto serial), esta cede el control al bucle para que pueda ejecutar otras tareas pendientes.
+
+El conflicto técnico central es que \code{rospy.spin()} (bucle principal de ROS) y \code{asyncio.get\_event\_loop().run\_forever()} son ambos bloqueantes y aspiran a tener el control total del hilo de ejecución principal. La solución desde la ingeniería consiste en ejecutar el bucle de eventos de asyncio en un \textbf{hilo dedicado} (\textit{daemon thread}), de modo que el hilo principal ejecute \code{rospy.spin()} y el hilo secundario ejecute \code{loop.run\_forever()}, permitiendo la coexistencia de ambos paradigmas sin que el bloqueo de uno afecte la latencia del otro.
+
+
+\subsubsection{Comunicación serial y protocolo}
+
+El protocolo que usa el RVR es binario y opera a 115200 baudios, siendo este ancho de banda el principal cuello de botella del sistema. La Capa 1 debe gestionar serialización/deserialización de paquetes, \textbf{validación de checksum} y \textbf{conversión de endianness} (la CPU ARM de la Raspberry Pi usa Little-Endian y el protocolo Sphero especifica Big-Endian para palabras multi-byte). Además, la integración eléctrica exige niveles lógicos de 3,3~V y el \textit{driver} debe ser robusto ante errores de transmisión (reintentos, validación de integridad).
+
+
+% =======================
+\section{Arquitectura de desarrollo}
+\label{sec:arquitectura_desarrollo}
+
+\subsection{Paradigma global: microservicios desacoplados}
+
+El software del laboratorio adopta un patrón arquitectónico de \textbf{microservicios desacoplados} en su diseño lógico, aunque físicamente puede desplegarse de forma monolítica en un servidor central para simplificar la gestión en entornos de laboratorio pequeños. La separación estricta entre el \textit{frontend} (Vue.js) y el \textit{backend} (FastAPI) permite que ambos evolucionen independientemente, unidos únicamente por un contrato de API RESTful bien estructurado y definido.
+
+Esta decisión arquitectónica es crucial para \textbf{evitar el \textit{overselling} de la escalabilidad}. Si bien el desacoplamiento facilita el mantenimiento, la dependencia actual de conexiones SSH directas desde el \textit{backend} hacia los robots introduce un acoplamiento fuerte en la capa de ejecución. El \textit{backend} no actúa simplemente como una API de datos, sino como un \textbf{\textit{proxy} de ejecución remota}, manteniendo conexiones de estado con los agentes robóticos. En consecuencia, la escalabilidad del sistema no está limitada únicamente por la capacidad de la base de datos o del servidor web, sino por la capacidad del servidor para gestionar múltiples subprocesos de SSH y transferencias SCP simultáneas sin bloquear el bucle de eventos principal de FastAPI.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/fig_arquitectura_global.png}
+\caption{Arquitectura global de la solución software: \textit{frontend} (Vue.js), \textit{backend} (FastAPI, PostgreSQL), robots (Raspberry Pi + ROS + RVR). Comunicación por API REST, SSH/SCP, UART. Fuente: elaboración propia.}
+\label{fig:arquitectura_global}
+\end{figure}
+
+
+\subsection{Driver ROS como arquitectura en tres capas}
+\label{sec:capas_driver}
+
+El driver (\code{atriz\_rvr\_driver}) se fundamenta en la separación de responsabilidades entre el entorno síncrono de \code{rospy} y el asíncrono del SDK de Sphero.
+
+
+\subsubsection{Capa 1: Comunicación física y protocolo}
+
+Esta es la capa más baja, responsable de la interacción directa con el hardware a través de la interfaz serial (\code{/dev/ttyAMA0}, \code{/dev/ttyS0} o \code{/dev/ttyUSB0}) de la Raspberry Pi. \textbf{Responsabilidades:} serialización y deserialización de paquetes binarios del protocolo Sphero API; cálculo y validación de \textit{checksums}; gestión de \textit{endianness} (conversión de \textit{Little-Endian} de la CPU ARM a \textit{Big-Endian} exigido por el protocolo Sphero para palabras \textit{multi-byte}); manejo de excepciones de E/S serial y de \textit{buffers} de entrada/salida. Dado que las operaciones de lectura/escritura serial son bloqueantes por naturaleza física (esperar bits), esta capa reside completamente dentro del bucle de eventos de asyncio; encapsula la instancia del SDK (SpheroRvrAsync) y gestiona el Sensor Streaming del RVR (tasas de muestreo, notificación a capas superiores).
+
+
+\subsubsection{Capa 2: Abstracción del robot y sincronización (HAL/Adapter)}
+
+Esta capa actúa como ``traductor'' y ``amortiguador'' entre el mundo asíncrono del hardware (Capa 1) y el 
+mundo estructurado de ROS (Capa 3). Implementa el \textbf{Patrón Adapter} para convertir llamadas de función de alto nivel (p.\ ej.\ \code{set\_leds(red)}, \code{move\_forward(speed)}) en las secuencias de bytes y identificadores de comando (DID/CID) específicos del protocolo RVR. El componente más crítico es un \textbf{State Buffer} protegido contra condiciones de carrera (\emph{race conditions}), dado que el hilo de ROS (Capa 3) y el hilo de asyncio (Capa 1) acceden a los datos de telemetría y comandos simultáneamente, se utilizan estructuras de datos inmutables o mecanismos de bloqueo (m\textit{utex}) para garantizar la coherencia de los datos. Este \textit{buffer} almacena la última lectura válida de los sensores y el último comando de velocidad recibido.
+
+
+\subsubsection{Capa 3: Aplicación y lógica de control ROS}
+
+Es el nodo principal de ROS, que hace suscripción a \code{/cmd\_vel}, conversión cinemática de unidades ROS (m/s, rad/s) a la escala nativa del RVR (0--255), actualización del State Buffer y publicación continua de datos de sensores (Odometría, IMU, Color). Implementa la lógica de seguridad: \textit{timeout} de comandos, límites de velocidad y parada de emergencia.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{images/fig_driver_capas.png}
+\caption{Arquitectura en tres capas del driver ROS: Capa 1 (UART, protocolo Sphero, asyncio), Capa 2 (Adapter, State Buffer), Capa 3 (rospy, /cmd\_vel, publicación de sensores). Fuente: elaboración propia.}
+\label{fig:driver_capas}
+\end{figure}
+
+
+\subsection{Infraestructura de hardware y robótica}
+
+\subsubsection{Plataforma móvil: Sphero RVR}
+
+El núcleo físico del enjambre del laboratorio es el Sphero RVR \cite{Sphero_RVR_Plus}, que es un chasis robótico educativo con capacidades de expansión. A diferencia de plataformas no didácticas, el RVR cuenta con un sistema de control de lazo cerrado interno, codificadores (\textit{encoders}) de alta resolución en sus motores y una unidad de medidas inerciales IMU (\textit{Inertial Measurement Unit}) de 9 grados de libertad. Sus características técnicas incluyen tracción tipo orugas (\emph{tank drive}), que permite giros en el sitio, ideal para navegación en espacios confinados; interfaz de control por puerto UART de 4 pines, que expone un protocolo serial para comunicación con computadores externos (Raspberry Pi); sensores integrados (color, luz ambiental, infrarrojos) accesibles vía SDK y expuestos a ROS.
+
+\begin{warningbox}
+\textbf{Advertencia (evitar \textit{overselling}):} Aunque el RVR es robusto, su odometría interna basada en orugas puede sufrir deslizamientos (\emph{slippage}) significativos en superficies lisas o alfombras, lo que degrada la precisión de la localización a estimar (\emph{dead reckoning}) con el tiempo. El software del laboratorio muestra los datos de odometría tal como vienen del robot, sin algoritmos de fusión de sensores avanzados (p.\ ej.\ EKF) en el servidor; por tanto, el usuario debe esperar deriva en la posición reportada.
+\end{warningbox}
+
+
+\subsubsection{Unidad de computación a bordo: Raspberry Pi}
+
+Cada robot posee una Raspberry Pi~4 (o 3 B+) que actúa como unidad de computación de alto nivel. Esta unidad ejecuta Ubuntu Server~20.04 y el middleware ROS Noetic. En ella se ejecutan el nodo del driver que traduce tópicos ROS a comandos seriales para el RVR y se mantiene el servidor SSH activo para recibir \textit{scripts} desde el \textit{backend} central. El \code{roscore}, el nodo de cámara (\code{usb\_cam}) y \code{web\_video\_server} se ejecutan en el servidor. Se requiere asegurar la energización adecuada (p.\ ej.\ vía puerto USB-C del RVR, 5\,V/2,1\,A) y disipación térmica activa, ya que el \emph{throttling} térmico reduce drásticamente el \textit{framerate} del vídeo y la respuesta del control.
+
+
+\subsubsection{Sensores externos: cámara USB}
+
+La percepción visual se hace por medio de una cámara USB estándar conectada a la Raspberry Pi. El nodo \code{usb\_cam} de ROS es el encargado de realizar la captura. Un problema recurrente ya documentado es la incompatibilidad de formatos de píxel (\emph{pixel format}); las cámaras pueden soportar MJPEG, YUYV o H.264 nativo; YUYV (sin compresión) consume mucho ancho de banda USB y CPU; MJPEG (comprimido en la cámara) reduce carga de CPU y ancho de banda USB. Se recomienda configurar \code{usb\_cam} para usar \code{mjpeg} si la cámara lo soporta, para liberar CPU en la Raspberry Pi para tareas de navegación.
+
+
+\subsection{Servidor web: \textit{backend} y \textit{frontend}}
+
+El \textit{backend} (FastAPI) expone API REST (usuarios, experimentos, robots, \code{POST /api/scripts/upload/}), gestiona la persistencia en PostgreSQL con SQLAlchemy, implementa OAuth2 con JWT (HMAC-SHA256) y el módulo \file{ros\_bridge.py} para transferir y ejecutar \textit{scripts} en los robots vía \code{scp} y \code{ssh}. El \textit{frontend} (Vue~3 SPA) se sirve como archivos estáticos (Nginx) y las rutas están protegidas por guards que redirigen a \code{/login} si no hay token válido. La visualización de vídeo se realiza incrustando la URL del \code{web\_video\_server} en una etiqueta \code{<img>}. La elección de FastAPI se justifica por su soporte nativo para asyncio, que es adecuado cuando las operaciones de E/S (esperar respuesta de un robot) son frecuentes y dado que un servidor síncrono bloquearía sus workers.
+
+A pesar de la velocidad de FastAPI, la principal limitación del \textit{backend} es el cuello de botella que reside en la naturaleza bloqueante de ciertas librerías de SSH (p.\ ej.\ paramiko si no se usa correctamente) o en la transferencia de archivos SCP grandes. Por su parte, en el frontend, al ser una SPA, la carga inicial puede ser pesada si no se implementa \emph{code splitting}; además, la visualización de vídeo MJPEG mediante etiquetas \code{<img>} que refrescan la fuente es ineficiente en términos de memoria y red comparado con decodificación H.264 por hardware en el cliente.
+
+
+% =======================
+\section{Desarrollo del módulo driver de la aplicación}
+\label{sec:driver_ros}
+
+El software del laboratorio gestiona el \textit{driver} desarrollado para el Sphero RVR. Este componente de software no es un simple paso de mensajes; por el contrario, es un \textbf{sistema complejo de traducción de protocolos}, gestión de estados y control cinemático que reconcilia el modelo de ejecución síncrono de \code{rospy} con el modelo asíncrono del SDK de Sphero.
+
+
+\subsection{Fundamentos y contexto tecnológico}
+
+El driver integra el SDK asyncio de Sphero con el \textit{middleware} ROS síncrono (\code{rospy}). La comunicación con el RVR se hace por puerto UART de 4 pines a 115200 baudios. El RVR no tolera señales de 5~V y por lo tanto usa 3,3~V o conversor de nivel. La API de Sphero utiliza m/s para fijar la velocidad, pero los comandos de bajo nivel (\textit{Drive With Heading}, \textit{Raw Motors}) usan una escala 0--255. El driver entonces debe implementar una conversión cinemática configurable (\code{max\_speed}: RVR estándar 2,0~m/s, RVR+ 1,5~m/s).
+
+
+\subsection{Concurrencia síncrono-asíncrono}
+
+Los \textit{callbacks} de \code{rospy} son síncronos y se ejecutan en hilos gestionados por ROS. El bucle de eventos de asyncio se ejecuta en un \textbf{hilo dedicado}, separado de \code{rospy.spin()}. Cuando la Capa 3 recibe un mensaje \code{/cmd\_vel}, esta realiza la conversión cinemática y actualiza el \textit{State Buffer} y la ejecución del comando Sphero no ocurre en el hilo del \textit{callback}. Un \textbf{Heartbeat Loop} (coroutine asíncrona periódica, típicamente 2--50 Hz) en el hilo de asyncio lee el comando más reciente del State Buffer y lo envía al RVR mediante \code{loop.create\_task()}, evitando bloquear el hilo de ROS. Este desacoplamiento temporal actúa como \textbf{control de flujo} y como \textbf{filtro de paso bajo implícito}, lo que permite que ROS publique comandos a alta frecuencia (p.\ ej.\ 100~Hz) mientras el driver envía al hardware a una tasa segura que no sature el bus UART (p.\ ej.\ 20~Hz).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/fig_concurrencia_driver.png}
+\caption{Concurrencia híbrida mediante hilo principal (rospy.spin), hilo asyncio (event loop, UART), State Buffer compartido y Heartbeat Loop que envía comandos al RVR. Fuente: elaboración propia.}
+\label{fig:concurrencia_driver}
+\end{figure}
+
+
+\subsection{Movimiento y control}
+
+\subsubsection{Tópico estándar /cmd\_vel}
+
+El driver se suscribe a \code{/cmd\_vel} (\code{geometry\_msgs/Twist}). Para el RVR tipo diferencial se usan \code{linear.x} (m/s) y \code{angular.z} (rad/s). Se recomienda suscribirse a la salida de un multiplexor (\code{twist\_mux}, p.\ ej.\ \code{/rvr/cmd\_vel\_in}) para priorizar fuentes (teleoperación, planificador).
+
+
+\subsubsection{Conversión cinemática y rawMotors}
+
+Velocidad lineal a escala RVR: \( speed\_rvr = (linear\_x / max\_speed) \times 255 \). Velocidad angular: \( \omega_{deg/s} = \omega_{rad/s} \times 180/\pi \). La arquitectura favorece \textbf{rawMotors} sobre \code{driveWithHeading} para control preciso, de modo que \code{driveWithHeading} utiliza el PID interno y la brújula del RVR, introduciendo comportamientos de ``caja negra'' y correcciones automáticas que pueden interferir con algoritmos de navegación superiores como SLAM (\textit{Simultaneous Localization and Mapping}) y planificadores de trayectoria, que asumen control directo sobre la dinámica del robot. Con rawMotors, el \textit{driver} implementa explícitamente la cinemática inversa diferencial (\( v\_left = linear\_x - (angular\_z \times track\_width)/2 \), \( v\_right = linear\_x + (angular\_z \times track\_width)/2 \)) y convierte las velocidades de orugas a la escala 0--255. Los parámetros \code{track\_width} y \code{max\_speed} se configuran en el archivo \file{.launch} para calibrar el \textit{driver} según superficies o estado de la batería; \code{track\_width} típico es de 0,15~m.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/fig_cinematica_cmd_vel.png}
+\caption{Flujo de control de movimiento: tópico \code{/cmd\_vel} (Twist: linear.x, angular.z) $\rightarrow$ conversión cinemática diferencial $\rightarrow$ velocidades left/right $\rightarrow$ rawMotors (escala 0--255) $\rightarrow$ UART. Fuente: elaboración propia.}
+\label{fig:cinematica_cmd_vel}
+\end{figure}
+
+
+\subsubsection{Heartbeat y failsafe}
+
+El RVR deja de moverse si no recibe comandos en 2 segundos. El \textit{Heartbeat Loop} reenvía periódicamente (intervalo < 2~s, p.\ ej.\ 500~ms) el último comando del State Buffer para mantener el movimiento continuo. Si el \textit{host} falla, el \textit{Heartbeat} cesa y el RVR se detiene (\textit{failsafe} pasivo). El \textit{driver} puede usar un \textit{timeout} de comando más agresivo (p.\ ej.\ 0,3~s) para detectar pérdida de comunicación.
+
+
+\subsection{Sensores y mensajes personalizados}
+
+El Sensor Streaming del RVR debe configurarse con una frecuencia conservadora (20--30 Hz) para no saturar la UART. Frecuencias mayores compiten por el ancho de banda con los comandos de motor y pueden introducir latencia en el control. Los datos se publican en mensajes estándar: \code{sensor\_msgs/Imu}, \code{nav\_msgs/Odometry}. Es crucial la \textbf{conversión de coordenadas} para la IMU: el marco de referencia del RVR puede no coincidir con el estándar REP-103 de ROS (X frontal, Y izquierda, Z arriba). La odometría se publica en \code{nav\_msgs/Odometry}, que incluye posición (x, y, z) y orientación (cuaterniones). Los cuaterniones son una representación matemática de la rotación que evita el bloqueo de cardán (\emph{gimbal lock}), aunque son menos intuitivos que los ángulos de Euler (\textit{Roll}, \textit{Pitch}, \textit{Yaw}) para la interpretación humana. La odometría se basa en los \textit{encoders} internos del RVR que al ser un vehículo de orugas, el deslizamiento (\textit{slippage}) durante los giros introduce error acumulativo en la estimación de posición (\textit{dead reckoning}). Para funcionalidades específicas del RVR se define el paquete \code{atriz\_rvr\_msgs}: p.\ ej.\ \code{DegreesTwist.msg} (velocidad angular en deg/s), \code{ColorDetection.msg}, servicios como estado de batería, control de LEDs, reset de odometría, parada de emergencia.
+
+
+\subsection{Metodología ROS-XP y estructura del repositorio}
+
+Se adopta una metodología que combina \textit{Extreme Programming} con la modularidad de ROS, que consiste en un desarrollo iterativo (conectividad UART, LEDs, movimiento, sensores, seguridad), integración y pruebas continuas, programación en parejas en componentes críticos, \textit{refactoring} y propiedad colectiva del código. La estructura típica es \code{atriz\_rvr\_driver/} (nodo \file{Atriz\_rvr\_node.py}), \code{atriz\_rvr\_msgs/}, \code{atriz\_rvr\_serial/}, \code{docs/}, \code{launch/}, \code{scripts/}, \code{testing\_scripts/} (automatizadas, interactivas, diagnóstico). Como pruebas se hace validación del driver, conversión cinemática, manejo de paquetes (checksum, buffers), mocks del puerto serial.
+
+
+% =======================
+\section{Desarrollo del servidor web}
+\label{sec:servidor_web}
+
+\subsection{\textit{Backend}: estructura y configuración}
+
+El \textit{backend} sigue una estructura modular inferida de buenas prácticas FastAPI y que consiste de:
+
+\begin{itemize}
+    \item \file{app/main.py}: instancia FastAPI, montaje de routers.
+    \item \file{app/core/config.py}: carga de variables de entorno (Pydantic \code{BaseSettings}).
+    \item \file{app/core/security.py}: \textit{hashing} (bcrypt), generación y validación JWT.
+    \item \file{app/api/deps.py}: dependencias (\code{get\_db}, \code{get\_current\_user}).
+    \item \file{app/api/api\_v1/endpoints/}: \file{login.py}, \file{users.py}, \file{experiments.py}, \file{scripts.py}.
+    \item \file{app/db/}: \file{session.py}, modelos SQLAlchemy, \file{init\_db.py}.
+    \item \file{app/models/}: \file{user.py}, \file{robot.py}, etc.
+    \item \file{app/schemas/}: esquemas Pydantic (usuarios, token, script).
+    \item \file{app/services/ros\_bridge.py}: integración SSH/SCP para envío y ejecución de scripts en robots.
+\end{itemize}
+
+Las variables de entorno críticas (archivo \file{.env}, \textbf{no} debe incluirse en el control de versiones) se resumen en la Tabla~\ref{tab:env}. CORS debe permitir los orígenes del \textit{frontend} (p.\ ej.\ \code{atriz-project.duckdns.org}, \code{localhost:8080}). Una configuración incorrecta es la causa más frecuente de fallos en el despliegue donde ``el login funciona pero nada más carga''. El middleware de FastAPI debe configurarse con \code{CORSMiddleware}, \code{allow\_origins}, \code{allow\_credentials=True}, \code{allow\_methods} y \code{allow\_headers} adecuados.
+
+\begin{table}[H]
+\centering
+\caption{Variables de entorno críticas del \textit{backend}}
+\label{tab:env}
+\begin{tabular}{p{0.28\textwidth}p{0.35\textwidth}p{0.28\textwidth}}
+\toprule
+\textbf{Variable} & \textbf{Descripción} & \textbf{Ejemplo / valor recomendado} \\
+\midrule
+\code{DATABASE\_URL} & Cadena de conexión PostgreSQL & \code{postgresql://user:pass@localhost:5432/atriz\_db} \\
+\code{SECRET\_KEY} & Clave maestra para firmar JWT & Cadena aleatoria 32+ caracteres (\code{openssl rand -hex 32}) \\
+\code{ALGORITHM} & Algoritmo de firma de tokens & HS256 \\
+\code{ACCESS\_TOKEN\_EXPIRE\_MINUTES} & Duración de la sesión & 30 (o 120 para laboratorios largos) \\
+\code{ROBOT\_SSH\_USER} & Usuario SSH en los robots & \code{ubuntu} o \code{pi} \\
+\code{ROBOT\_SSH\_KEY\_PATH} & Ruta a la llave privada RSA & \file{/home/server/.ssh/id\_rsa} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsubsection{Modelo de datos y ciclo de vida del \textit{token}}
+
+Se utiliza PostgreSQL como sistema de gestión de bases de datos objeto-relacional ORDBMS (\textit{Object-Relational Database Management System}) \cite{PostgreSQL_Website}, interactuando a través del ORM SQLAlchemy \cite{SQLAlchemy_Website}. El esquema incluye a \textbf{usuarios} (\code{users}: credenciales \textit{hasheadas} con bcrypt, roles y metadatos), \textbf{robots} (registro de inventario, direcciones IP, claves SSH asociadas, estado operativo) y \textbf{experimentos} (logs de sesiones, scripts cargados y resultados de telemetría asociados). La persistencia permite abstraer las consultas SQL y facilitar migraciones futuras.
+
+El estándar OAuth2 con flujo de contraseña (\emph{Password Flow}) se utiliza para la obtención de \textit{tokens} JWT (\textit{JSON Web Tokens}) \cite{RFC7519_JWT}. El \textit{token} consta de tres partes: \textbf{Encabezado}, \textbf{Payload} (carga útil: \code{sub} sujeto/username, \code{exp} expiración) y \textbf{Firma} generada con \code{SECRET\_KEY} usando HMAC-SHA256. Esto garantiza que el \textit{token} no ha sido manipulado por el cliente (si un usuario modifica su rol en el \textit{payload}, la firma no coincidirá y el servidor rechazará la petición). En el ciclo de vida, el usuario se autentica vía \code{/api/login}; si las credenciales son válidas recibe un \code{access\_token} firmado y con tiempo de expiración configurado. En cada petición a \textit{endpoints} protegidos (p.\ ej.\ mover robot, cargar script) se verifica la validez del \textit{token} mediante la dependencia \code{get\_current\_user}; si falta, ha expirado o la firma es inválida, se rechaza con \textit{401 Unauthorized} \textbf{antes} de ejecutar cualquier lógica de negocio.
+
+
+\subsection{Módulo ros\_bridge.py}
+
+Este módulo es el diferenciador clave puesto que gestiona el despliegue y la ejecución remota de \textit{scripts} en los robots.
+
+\begin{enumerate}
+    \item \textbf{Recepción:} El \textit{endpoint} \code{POST /api/scripts/upload/} recibe un archivo (UploadFile); se valida extensión \code{.py} y tamaño (p.\ ej.\ límite 1MB).
+    \item \textbf{Almacenamiento temporal:} Se guarda en un directorio temporal (p.\ ej.\ \file{/tmp/atriz\_uploads/}) con nombre único (UUID).
+    \item \textbf{Transferencia SCP:} Se transfiere el archivo al robot destino (paramiko o \code{subprocess} con \code{scp}); maneja \textit{timeouts} si el robot está apagado o fuera de rango.
+    \item \textbf{Ejecución SSH:} Se envía el comando de ejecución. Comando típico: \code{source /opt/ros/noetic/setup.bash \&\& export ROS\_MASTER\_URI=... \&\& rosrun sphero\_rvr\_pkg script\_executor.py <script\_name>}.
+    \item \textbf{Salida:} Capturar stdout/stderr del \textit{script} remoto y devolverla al \textit{frontend} o registrar en \textit{logs}.
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Riesgo de seguridad:} La ejecución de código arbitrario subido por usuarios conlleva riesgos. En un entorno profesional debería ejecutarse en un contenedor o \textit{sandbox} en el robot. La implementación actual asume un entorno de confianza (laboratorio académico).
+\end{warningbox}
+
+
+\subsubsection{Decisión arquitectónica de SSH/SCP frente a Rosbridge}
+
+Una decisión fundamental es el mecanismo para enviar comandos desde el servidor al robot. El software implementa un módulo \file{ros\_bridge.py} basado en SSH y SCP en lugar de \code{rosbridge\_suite} (WebSockets directos a ROS). En la Tabla~\ref{tab:ssh_vs_rosbridge} se resume el análisis comparativo.
+
+\begin{table}[H]
+\centering
+\caption{Comparativa SSH/SCP (Atriz) frente a Rosbridge (WebSockets)}
+\label{tab:ssh_vs_rosbridge}
+\begin{tabular}{p{0.22\textwidth}p{0.35\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{Característica} & \textbf{Enfoque WebSockets (rosbridge)} & \textbf{Enfoque SSH/SCP} \\
+\midrule
+Mecanismo & JSON sobre WebSockets directo al puerto del robot & Tunelización SSH y ejecución de procesos remotos \\
+Seguridad & Requiere exponer puertos ROS a la red o VPN & Utiliza protocolos estándar cifrados (claves SSH) \\
+Gestión de archivos & Difícil transferir scripts complejos & Nativo vía SCP (\textit{Secure Copy}) \\
+Latencia & Baja (conexión persistente) & Alta en inicio (\textit{handshake}), baja en ejecución \\
+Estado & Stateless (típicamente) & Stateful (gestión de procesos remotos) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En el modelo del laboratorio, cuando un usuario sube un \textit{script}, el \textit{backend} guarda el archivo temporalmente, utiliza \code{scp} para transferirlo a la Raspberry Pi del robot y utiliza \code{ssh} para invocar \code{rosrun sphero\_rvr\_pkg script\_executor.py <nombre\_script>}. Este enfoque aísla el entorno de ejecución del robot del servidor web y aprovecha la seguridad robusta de SSH, aunque introduce una latencia inicial en el despliegue del experimento.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/Control_ssh.png}
+\caption{Interfaz de control y ejecución remota vía SSH/SCP. Envío de \textit{scripts} al robot y monitoreo de la ejecución (módulo \file{ros\_bridge.py}). Fuente: elaboración propia.}
+\label{fig:control_ssh}
+\end{figure}
+
+
+\subsection{\textit{Frontend}: Vue.js 3}
+
+La interfaz es una SPA (Vue~3) y tras \code{npm run build} se sirve como archivos estáticos. \textit{Login} envía credenciales a \code{/api/login} (\code{application/x-www-form-urlencoded}); si es exitoso, el \textit{backend} devuelve un JWT que el \textit{frontend} almacena en \code{localStorage} y envía en el encabezado \code{Authorization}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{images/Login.png}
+\caption{Pantalla de inicio de sesión del servidor web del laboratorio. Es un formulario que envía credenciales a \code{/api/login} y recibe el \textit{token} JWT. Fuente: elaboración propia.}
+\label{fig:login}
+\end{figure}
+
+Se configuran \textbf{interceptores de Axios} para inyectar automáticamente el \textit{token} JWT en las cabeceras de todas las peticiones salientes. Las rutas del \textit{dashboard}, editor de código (Monaco) y vídeo/sensores están protegidas por un \textit{guard} de Vue Router que redirige a \code{/login} si no hay token válido. La \code{baseURL} de Axios debe apuntar al dominio de la API y coincidir con CORS. Para la \textbf{Visualización de vídeo}, este \emph{no} fluye a través de la API de FastAPI (lo cual sería ineficiente); el \textit{frontend} incrusta un elemento \code{<img>} cuya fuente apunta directamente al puerto 8080 del robot, donde corre \code{web\_video\_server}. La URL típica es \code{http://<ROBOT\_IP>:8080/stream?topic=/usb\_cam/image\_raw\&type=mjpeg\&quality=50\&width=640\&height=480}; los parámetros \code{quality}, \code{width}, \code{height} son críticos para controlar el ancho de banda y evitar saturar la red WiFi. Sin ellos, el servidor intentaría enviar imágenes en resolución nativa y máxima calidad, saturando la red inalámbrica y causando latencia extrema (del orden de segundos).
+
+
+\subsubsection{Subsistema de vídeo y análisis de latencia}
+
+La transmisión de vídeo es el componente más exigente del sistema. El enfoque del laboratorio (usando \code{web\_video\_server}) prioriza la \textbf{compatibilidad universal} (funciona en cualquier navegador sin \textit{plugins}) sobre el rendimiento absoluto. \textbf{MJPEG (Motion JPEG):} envía una secuencia de imágenes JPEG completas, con la ventaja de ser tolerante a errores, fácil de implementar y de bajo costo computacional en el cliente; la desventaja es ancho de banda elevado y no aprovecha la redundancia temporal entre cuadros (compresión inter-frame). En una red WiFi 802.11n, un \textit{stream} de 640×480 a 30\,fps puede ocupar 5--10\,Mbps, que multiplicado por varios robots, satura el canal provocando colisiones de paquetes y latencia impredecible.
+
+\begin{warningbox}
+\textbf{Evitar \textit{overselling}:} Este documento declara que el sistema \textbf{no es apto} para teleoperación de alta velocidad (p.\ ej.\ drones o vehículos rápidos) debido a la latencia inherente: típicamente 200--500\,ms en condiciones ideales, y superior a 1\,s en redes congestionadas.
+\end{warningbox}
+
+Se pueden aplicar estrategias de optimización sin cambiar la arquitectura como reducción de resolución (p.\ ej.\ 320×240 para monitoreo general), compresión agresiva (ajustar \code{quality} a 30 en la URL del stream), reducción de \textit{framerate} (limitar la cámara a 10 o 15\,fps en el archivo \file{.launch}), uso de routers WiFi de 5\,GHz (802.11ac) para evitar interferencias con Bluetooth y dispositivos de 2,4\,GHz.
+
+
+\subsection{Integración ROS en el robot}
+
+En el servidor se ejecutan \code{roscore} (o maestro remoto), el nodo de cámara (\code{usb\_cam\_node}, \file{camera.launch}) y \code{web\_video\_server} (puerto 8080). En la Raspberry Pi del robot se ejecutan el nodo del driver RVR (traduce \code{/cmd\_vel} a UART) y el ejecutor de \textit{scripts} que recibe órdenes del \textit{backend}. Los archivos \file{.launch} deben configurar el puerto serial (\code{/dev/ttyS0} o \code{/dev/ttyUSB0}), el formato de píxel de la cámara (\code{mjpeg} o \code{yuyv}) y parámetros de \code{web\_video\_server}. La ejecución de \textit{scripts} es remota: la API copia el archivo al robot y lo ejecuta en el contexto ROS; depende de que las Raspberry Pi tengan SSH activo y el paquete \code{sphero\_rvr\_pkg} instalado.
+
+
+% =======================
+\section{Integración driver--servidor y flujo completo}
+\justifying
+
+La integración entre el servidor web y el driver ROS se realiza exclusivamente vía SSH/SCP desde el \textit{backend} hacia la Raspberry Pi. El \textit{backend} no habla ROS directamente; este invoca procesos que ejecutan \code{rosrun} o publican en tópicos desde la línea de comandos en el robot.
+
+
+\subsection{Traza de ejecución de un comando de movimiento}
+
+Para comprender la integración \textit{end-to-end}, se describe el flujo completo de un comando manual de movimiento (p.\ ej.\ botón ``Adelante'' en el dashboard):
+
+\begin{enumerate}
+    \item \textbf{Origen:} El usuario pulsa el botón ``Adelante'' en el \textit{dashboard} de Vue.js.
+    \item \textbf{Transmisión web:} El navegador envía un \code{POST} a \code{/api/robots/\{id\}/command} (o equivalente) con \textit{payload} JSON (\code{linear}, \code{angular}) y cabecera \code{Authorization: Bearer <token>}.
+    \item \textbf{Procesamiento backend:} FastAPI recibe la petición, valida el token y verifica permisos; invoca una función en \file{ros\_bridge.py}.
+    \item \textbf{Transporte seguro:} \file{ros\_bridge.py} ejecuta un comando SSH (o escribe en un \textit{socket} persistente) hacia la IP del robot, inyectando el comando de velocidad.
+    \item \textbf{Middleware ROS:} En el robot, un nodo (p.\ ej.\ \code{script\_executor} o un nodo puente SSH-to-ROS) recibe la instrucción y publica un mensaje \code{geometry\_msgs/Twist} en el tópico \code{/cmd\_vel}.
+    \item \textbf{Driver Atriz (Capa 3):} El callback del driver recibe el mensaje Twist.
+    \item \textbf{Sincronización (Capa 2):} El mensaje se convierte a velocidades de motor y se actualiza en el State Buffer de forma thread-safe.
+    \item \textbf{Ejecución física (Capa 1):} El Heartbeat Loop (que corre a 2--50~Hz) lee el buffer, construye el paquete binario UART con checksum y lo escribe en el puerto serial (\code{/dev/ttyAMA0} o \code{/dev/ttyS0}).
+    \item \textbf{Hardware:} El microcontrolador del RVR recibe el paquete, valida el \textit{checksum} y aplica voltaje a los motores.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{images/fig_flujo_comando_movimiento.png}
+\caption{Traza \textit{end-to-end} de un comando de movimiento, desde el botón en el \textit{dashboard} (Vue.js) hasta los motores del RVR, pasando por API, SSH, ROS y UART. Fuente: elaboración propia.}
+\label{fig:flujo_comando_movimiento}
+\end{figure}
+
+La latencia acumulada en esta cadena es la suma de latencia red WiFi + procesamiento HTTP + overhead SSH + colas de mensajes ROS + buffer serial. El sistema mitiga los efectos de latencia variable mediante: (1) \textbf{Heartbeat en el \textit{driver}:} si el flujo de comandos se interrumpe (p.\ ej.\ lag en WiFi), el \textit{driver} sigue enviando el último comando válido o (más seguro) detiene el robot tras un \textit{timeout} agresivo (0,3~s); (2) \textbf{Sincronización de relojes:} es vital que el servidor y los robots estén sincronizados vía NTP, ya que la autenticación JWT y los timestamps de los mensajes ROS (\code{header.stamp}) dependen de una referencia de tiempo común.
+
+
+\subsection{Flujo para ejecución de \textit{script}}
+
+El flujo completo para ``ejecutar \textit{script}'' es: (1) Usuario sube \textit{script} en la interfaz Vue.js; (2) \textit{Frontend} envía \code{POST /api/scripts/upload/} con archivo e IP del robot; (3) FastAPI valida JWT y permisos; (4) \file{ros\_bridge.py} escribe el script en temporal, lo transfiere por SCP al robot y ejecuta por SSH \code{rosrun sphero\_rvr\_pkg script\_executor.py <script>}; (5) En el robot, el ejecutor carga y ejecuta el script en el entorno ROS; (6) El \textit{driver} RVR ya está publicando \code{/cmd\_vel}, odometría y sensores; el script puede suscribirse a tópicos o llamar a servicios según la API del paquete. La salida del \textit{script} se captura y se devuelve al \textit{frontend}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/Control_experimentos.png}
+\caption{Vista de control de experimentos en el \textit{dashboard} que muestra la gestión de scripts y sesiones con los robots (integración \textit{frontend}--\textit{backend}--ROS). Fuente: elaboración propia.}
+\label{fig:control_experimentos}
+\end{figure}
+
+
+% =======================
+\section{Configuración y despliegue}
+\label{sec:config_despliegue}
+
+\subsection{Requisitos de infraestructura}
+\begin{itemize}
+    \item \textbf{Servidor:} Máquina con soporte para Python~3.8+, PostgreSQL y Nginx (o servidor web equivalente).
+    \item \textbf{Robots:} Raspberry Pi~4 (o 3 B+) con Ubuntu~20.04 para soporte oficial de ROS Noetic; paquete \code{sphero-sdk-raspberrypi-python} instalado y configurado; visibilidad de red entre servidor y robots (IPs estáticas recomendadas).
+    \item \textbf{Red:} Conectividad WiFi robusta; preferiblemente banda de 5\,GHz para vídeo y control.
+\end{itemize}
+
+
+\subsection{Base de datos y \textit{backend}}
+
+\textbf{Preparación del sistema (servidor Ubuntu~20.04):} \code{sudo apt update \&\& sudo apt upgrade -y}; \code{sudo apt install python3-pip python3-venv postgresql postgresql-contrib nginx git -y}. \textbf{Configuración de base de datos:} crear base de datos (p.\ ej.\ \code{swarm\_lab}), usuario y permisos (\code{CREATE DATABASE swarm\_lab}; \code{CREATE USER atriz\_user WITH PASSWORD '...'}; \code{GRANT ALL PRIVILEGES ON DATABASE swarm\_lab TO atriz\_user}). Inicializar esquema con \file{app/db/init\_db.py} o migraciones Alembic (\code{alembic upgrade head}). \textit{Backend}: clonar repositorio, \code{pip install -r requirements.txt}, configurar \file{.env} (véase Tabla~\ref{tab:env}), ejecutar en producción con Gunicorn y workers Uvicorn: \code{gunicorn -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000 app.main:app} (o \code{uvicorn app.main:app --host 0.0.0.0 --port 8000} en desarrollo).
+
+
+\subsection{\textit{Frontend} y Nginx}
+
+El \textit{frontend} debe compilarse en una máquina de desarrollo y desplegarse solo los archivos estáticos (artefactos): \code{npm install}; \code{npm run build}; copiar la carpeta \code{dist/} al servidor en \file{/var/www/atriz\_frontend}. Nginx es esencial para servir el \textit{frontend} y redirigir las llamadas \code{/api} al \textit{backend} (Gunicorn), unificando todo en el puerto 80/443. Configuración típica: \code{server \{ listen 80; server\_name atriz-project.duckdns.org; location / \{ root /var/www/atriz\_frontend; try\_files \$uri \$uri/ /index.html; \} location /api \{ proxy\_pass http://127.0.0.1:8000; proxy\_set\_header Host \$host; proxy\_set\_header X-Real-IP \$remote\_addr; \} \}}. La directiva \code{try\_files \$uri \$uri/ /index.html} es necesaria para el modo \emph{history} de Vue Router.
+
+\subsection{Robots: preparación UART y SSH}
+\textbf{Preparación del robot (Raspberry Pi):}
+\begin{itemize}
+    \item Instalar Ubuntu~20.04 y ROS Noetic.
+    \item \textbf{Deshabilitar la consola serial} en \file{/boot/config.txt} (o \file{/boot/firmware/config.txt}) para liberar el UART (\code{/dev/ttyAMA0} o \code{/dev/ttyS0}).
+    \item Clonar el repositorio del \textit{driver} (\code{Atriz\_rvr}) y compilar con \code{catkin\_make}.
+    \item Verificar permisos del puerto serial: añadir el usuario que ejecuta el nodo ROS al grupo \code{dialout} para acceso a \code{/dev/ttyAMA0} o \code{/dev/ttyUSB0}.
+\end{itemize}
+
+\textbf{SSH:} El servidor debe tener la clave privada configurada en \code{ROBOT\_SSH\_KEY\_PATH}; ejecutar \code{ssh usuario@ip\_robot} manualmente una vez para aceptar el \textit{fingerprint} del robot (o configurar \code{known\_hosts}) y evitar ``Host key verification failed''.
+
+\textbf{Ejecución típica:} En el robot: \code{roslaunch atriz\_rvr\_driver rvr.launch} (o equivalente según el paquete). En el servidor: \code{uvicorn app.main:app --host 0.0.0.0 --port 8000} o Gunicorn según se indicó.
+
+
+% =======================
+\section{Pruebas y calidad}
+\label{sec:pruebas}
+
+\subsection{Driver ROS}
+
+Se propuso el siguiente conjunto de pruebas: automatizadas (validación del \textit{driver}, pruebas completas del sistema), interactivas (funciones individuales) y diagnóstico. Validar comunicación serial (con mocks), conversión cinemática, manejo de paquetes con \textit{checksum} inválido y condiciones de concurrencia. Métricas recomendadas: complejidad ciclomática por función < 10, líneas por función < 50, densidad de comentarios en código crítico > 20\%.
+
+
+\subsection{Servidor web}
+
+El manual define una matriz de pruebas para validar la operatividad del sistema. En la Tabla~\ref{tab:pruebas_func} se resume el plan de pruebas funcionales, los resultados esperados y las acciones correctivas ante fallo.
+
+\begin{table}[H]
+\centering
+\caption{Plan de pruebas funcionales del servidor web}
+\label{tab:pruebas_func}
+\begin{tabular}{p{0.12\textwidth}p{0.28\textwidth}p{0.28\textwidth}p{0.25\textwidth}}
+\toprule
+\textbf{ID} & \textbf{Descripción} & \textbf{Resultado esperado} & \textbf{Acción si falla} \\
+\midrule
+TC-01 & \textit{Login} con credenciales válidas & Redirección a \textit{dashboard}; \textit{token} en \code{localStorage} & Verificar conexión DB; revisar \textit{logs backend} \\
+TC-02 & Visualización de vídeo & Imagen fluida en \textit{dashboard} & Verificar \code{web\_video\_server} en robot; firewall puerto 8080 \\
+TC-03 & Envío de \textit{script} simple (p.\ ej.\ LEDs) & Robot ejecuta acción física & Verificar claves SSH; servicio ROS en robot \\
+TC-04 & Persistencia de usuario & Datos se mantienen tras reinicio del servidor & Verificar volumen de PostgreSQL; \code{DATABASE\_URL} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Adicionalmente se realizaron pruebas de API (CRUD de usuarios: POST, GET, PUT, DELETE y verificación en PostgreSQL); pruebas de seguridad (rechazo de \textit{login} con credenciales incorrectas; denegación de acceso a \textit{endpoints} protegidos sin \textit{token} JWT válido, p.\ ej.\ al acceder a \code{/api/scripts/upload} vía \code{curl} o Postman sin \textit{token}). La Figura~\ref{fig:no_acces} ilustra la respuesta del sistema ante un intento de acceso sin autenticación válida.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{images/no_acces.png}
+\caption{Respuesta de acceso denegado (401 Unauthorized) cuando se intenta acceder a un recurso protegido sin \textit{token} JWT válido; validación en \code{get\_current\_user}. Fuente: elaboración propia.}
+\label{fig:no_acces}
+\end{figure}
+
+
+% =======================
+\section{Seguridad, riesgos y limitaciones}
+\label{sec:riesgos}
+
+\subsection{Seguridad lógica y de acceso}
+\begin{itemize}
+    \item \textbf{Control de acceso basado en roles (RBAC):} El sistema de usuarios distingue entre administradores y usuarios estándar, limitando operaciones críticas (borrar usuarios, reconfigurar robots).
+    \item \textbf{Protección de API:} El uso de Pydantic asegura que los datos inyectados cumplan esquemas estrictos, previniendo inyección de comandos malformados.
+    \item \textbf{Aislamiento de red:} Aunque el servidor web puede ser público, la comunicación con los robots debe realizarse idealmente en una VLAN segura o mediante túneles, minimizando la superficie de ataque hacia los actuadores.
+\end{itemize}
+
+Con respecto a la seguridad, se puede afirmar que: (1) \textbf{Transmisión de vídeo no cifrada:} el \textit{stream} MJPEG sobre HTTP (puerto 8080) generalmente no está protegido por autenticación ni cifrado TLS en la configuración estándar de \code{web\_video\_server}; cualquier equipo en la red local puede acceder a \code{http://<IP\_ROBOT>:8080}. (2) \textbf{Claves SSH:} la seguridad de los robots depende enteramente de la custodia de la clave privada SSH en el servidor.
+
+
+\subsection{Seguridad operacional robótica (failsafe)}
+
+El driver implementa múltiples capas de seguridad para prevenir daños físicos:
+
+\begin{itemize}
+    \item \textbf{Failsafe pasivo (hardware):} El \textit{firmware} del Sphero RVR detiene los motores si no recibe comandos UART válidos en aproximadamente 2 segundos.
+    \item \textbf{Failsafe activo (driver):} El driver Atriz implementa un timeout interno más estricto (0,3 segundos). Si el nodo ROS deja de recibir mensajes en \code{/cmd\_vel} (p.\ ej.\ caída del script de control o del puente SSH), el Heartbeat Loop detecta la ``frescura'' del dato y envía activamente un comando de velocidad cero (0,~0) antes de que actúe el failsafe del hardware, asegurando una parada más rápida y controlada.
+    \item \textbf{Parada de emergencia (E-Stop):} La interfaz web incluye un botón de Parada de Emergencia que invoca un servicio prioritario en el \textit{driver} para cortar la potencia y sobrescribir cualquier comando en cola.
+\end{itemize}
+
+
+\subsection{Riesgos del \textit{driver} RVR}
+
+\begin{itemize}
+    \item \textbf{Conflictos de control:} Evitar operar el RVR simultáneamente desde Sphero EDU y el \textit{driver}; el diseño establece que el \textit{driver} debe tener prioridad exclusiva. Si se utilizan múltiples nodos de control en ROS (navegación autónoma vs teleoperación manual), se recomienda el uso de un nodo \code{twist\_mux} (multiplexor) para arbitrar prioridades y asegurar que solo una fuente controle los motores a la vez.
+    \item \textbf{Estados de sueño:} Si el RVR está en Soft Sleep, el \textit{driver} debe invocar \code{wake()} antes de comandos de movimiento o \textit{streaming}.
+    \item \textbf{Saturación UART:} Priorizar comandos de control sobre telemetría; calibrar frecuencia del Sensor Streaming (p.\ ej.\ $\leq$ 30~Hz).
+    \item \textbf{Latencia:} Un bucle de eventos dedicado con delegación asíncrona reduce el bloqueo frente a usar \code{asyncio.run()} dentro de \textit{callbacks} de ROS.
+\end{itemize}
+
+
+\subsection{Servidor web}
+
+\begin{itemize}
+    \item \textbf{MJPEG:} No hay compresión inter-frame; un stream 640×480 a 30~fps puede ocupar 5--10~Mbps; latencia típica 200--500~ms. Reducir resolución, \code{quality} y framerate en \file{.launch} (10--15~fps); usar WiFi 5~GHz cuando sea posible.
+    \item \textbf{Odometría:} El RVR reporta odometría interna; puede haber deslizamiento en superficies lisas; la plataforma muestra los datos sin fusión de sensores avanzada (EKF).
+    \item \textbf{JWT:} La desincronización de reloj entre cliente y servidor puede causar rechazo de \textit{tokens} válidos; sincronizar con NTP.
+    \item \textbf{\textit{Token} en localStorage:} Vulnerable a XSS; en entornos de mayor exigencia considerar \textit{cookies} \code{httpOnly}. El \textit{stream} MJPEG (puerto 8080) en configuración estándar no suele estar cifrado ni protegido por autenticación.
+\end{itemize}
+
+
+\subsection{Resolución de problemas comunes}
+
+\begin{itemize}
+    \item \textbf{``Method Not Allowed'' o ``401 Unauthorized'' en API:} Generalmente indica \textit{token} JWT expirado o falta de cabecera de autorización; desloguear y volver a loguear; verificar sincronización de reloj (NTP).
+    \item \textbf{Lag en vídeo:} Revisar saturación del canal WiFi; reducir resolución en \code{web\_video\_server} o cambiar formato de píxel en \code{usb\_cam} (\code{mjpeg} o \code{yuyv}).
+    \item \textbf{Robot no responde:} Verificar si el robot entró en modo Sleep; el \textit{driver} debería despertarlo (\code{wake()}), pero si la batería es crítica el robot puede ignorar comandos. Comprobar \textit{logs} de \code{rosconsole} para errores de \textit{checksum} serial.
+\end{itemize}
+
+
+\subsection{Recomendaciones de evolución}
+
+Enfocadas a llevar la plataforma a un nivel más profesional: (1) \textbf{WebRTC} para vídeo de baja latencia (< 200 ms), reemplazando el \textit{stream} MJPEG; (2) \textbf{Containerización} (Docker/docker-compose) para despliegue reproducible en infraestructuras heterogéneas; (3) \textbf{Descubrimiento de flotas} (Avahi/mDNS) para no depender de IPs estáticas; (4) \textbf{Colas de tareas} (Celery + Redis) para ejecución asíncrona de scripts con monitoreo, cancelación y timeouts configurables; (5) \textbf{Migración a ROS 2} en el driver para mejor integración nativa con asyncio y mejores garantías de tiempo real.
+
+
+\subsection{Estado actual, madurez y conclusiones}
+
+El Laboratorio de Robótica de Enjambres de la Universidad de Nariño en su estado actual es una herramienta \textbf{funcional} para la experimentación académica en robótica de enjambre. Proporciona una abstracción útil sobre ROS, permitiendo que estudiantes e investigadores se enfoquen en la lógica de algoritmos sin gestionar manualmente conexiones SSH, túneles de red o la compilación de paquetes de catkin. Sin embargo, sus limitaciones en transmisión de vídeo (MJPEG, latencia 200--500\,ms o superior) y la dependencia de ejecución síncrona de \textit{scripts} vía SSH \textbf{limitan su uso} en escenarios industriales o de misión crítica.
+
+Este documento no afirma que el sistema sea ``tiempo real'' absoluto ni ``plug-and-play'' universal; en su lugar, presenta un análisis técnico riguroso que expone las limitaciones y dependencias de hardware y red, de modo que cualquier operador o desarrollador que pretenda mantener, escalar o replicar la plataforma disponga de una referencia completa y honesta.
+
+\begin{infobox}
+\textbf{Resumen:} Este documento de desarrollo unifica la especificación del \textit{driver} ROS para el Sphero RVR y del servidor web del laboratorio, proporcionando la base para el mantenimiento, la extensión y la replicación del sistema en entornos académicos y de investigación. Se ha redactado en lenguaje académico formal, evitando \textit{overselling} y declarando explícitamente las limitaciones del sistema (odometría sin fusión de sensores avanzada, vídeo MJPEG no apto para teleoperación de alta velocidad, escalabilidad limitada por SSH/SCP, dependencias de hardware y red).
+\end{infobox}
+
+
+\section{Bibliografía}
+
+
+\printbibliography
+
+
+\end{document}

@@ -1,0 +1,1390 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{csquotes}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{seqsplit}
+\usepackage{xurl}
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{Bibliografia.bib} % <-- tu archivo .bib
+
+\newcommand{\code}[1]{\textcolor{codeblue}{\url{#1}}}
+\newcommand{\file}[1]{\textcolor{darkblue}{\url{#1}}}
+\newcommand{\funcion}[1]{\textcolor{darkblue}{\url{#1}}}
+
+% --- Profundidad de numeración y tabla de contenidos ---
+\setcounter{secnumdepth}{5}  % Numera hasta subparagraph (5 niveles)
+\setcounter{tocdepth}{3}     % Muestra en índices hasta subsubsection (3 niveles)
+
+% --- Redefinir "Cuadro" como "Tabla" para babel español ---
+\addto\captionsspanish{%
+  \def\tablename{Tabla}%
+}
+% Redefinición adicional para asegurar que funcione
+\AtBeginDocument{%
+  \renewcommand{\tablename}{Tabla}%
+}
+
+% --- Numeración jerárquica de figuras y tablas por sección ---
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+% --- Colores personalizados ---
+\definecolor{darkblue}{rgb}{0.1, 0.2, 0.4}
+\definecolor{sectioncolor}{rgb}{0.15, 0.35, 0.65}
+\definecolor{codegray}{rgb}{0.96, 0.96, 0.96}
+\definecolor{codeblue}{rgb}{0.25, 0.41, 0.88}
+\definecolor{codegreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{warningcolor}{rgb}{0.8, 0.4, 0.0}
+\definecolor{successcolor}{rgb}{0.0, 0.6, 0.0}
+\definecolor{infocolor}{rgb}{0.0, 0.4, 0.8}
+
+% --- Encabezado y pie de página ---
+\pagestyle{fancy}
+\fancyhead[L]{\textbf{\textcolor{darkblue}{Análisis Técnico Driver RVR}}}
+\fancyhead[R]{\textbf{\textcolor{darkblue}{Driver Atriz}}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Estilo de página para inicio de capítulo (sin encabezado)
+\fancypagestyle{chapterpage}{
+    \fancyhf{} % Limpia encabezados y pies
+    \fancyfoot[C]{\thepage} % Solo número de página en el pie
+    \renewcommand{\headrulewidth}{0pt} % Sin línea de encabezado
+    \renewcommand{\footrulewidth}{0.4pt} % Mantiene línea de pie
+}
+
+% Estilo de página para índices (sin encabezado ni líneas)
+\fancypagestyle{indexpage}{
+    \fancyhf{} % Limpia encabezados y pies
+    \fancyfoot[C]{\thepage} % Solo número de página en el pie
+    \renewcommand{\headrulewidth}{0pt} % Sin línea de encabezado
+    \renewcommand{\footrulewidth}{0pt} % Sin línea de pie
+}
+
+% --- Hipervínculos (evitar caracteres no ASCII en bookmarks) ---
+\pdfstringdefDisableCommands{%
+  \def\code#1{#1}%
+  \def\file#1{#1}%
+}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    urlcolor=darkblue,
+    pdftitle={Análisis Técnico Driver ROS - Sphero RVR},
+    pdfauthor={Equipo de Desarrollo Driver Atriz}
+}
+
+% --- Estilo de títulos ---
+\titleformat{\section}[display]
+  {\normalfont\Large\bfseries\color{sectioncolor}}
+  {\vspace*{1cm}\huge Capítulo \thesection}
+  {20pt}
+  {\Huge\color{sectioncolor}}
+  [\thispagestyle{chapterpage}]
+\titlespacing*{\section}
+  {0pt}{0pt}{40pt}
+
+\titleformat{\subsection}
+  {\Large\bfseries\color{darkblue}}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}
+  {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{darkblue}}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}
+  {0pt}{3ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\paragraph}
+  {\normalsize\bfseries\color{darkblue}}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+  {0pt}{2.5ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+\titleformat{\subparagraph}
+  {\normalsize\itshape\color{darkblue}}{\thesubparagraph}{1em}{}
+\titlespacing*{\subparagraph}
+  {0pt}{2ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+% --- Configuración del listado de código ---
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codegreen},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  language=Python,
+  inputencoding=utf8,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+% --- Espaciado entre líneas ---
+\onehalfspacing
+
+% --- Ajuste del encabezado ---
+\setlength{\headheight}{14pt}
+
+% --- Comandos personalizados ---
+\newcommand{\warning}[1]{\textcolor{warningcolor}{\textbf{ADVERTENCIA:} #1}}
+\newcommand{\tip}[1]{\textcolor{successcolor}{\textbf{CONSEJO:} #1}}
+\newcommand{\info}[1]{\textcolor{infocolor}{\textbf{INFORMACIÓN:} #1}}
+% \newcommand{\code}[1]{\lstinline[language=bash]{#1}}
+% \newcommand{\file}[1]{\texttt{#1}}
+
+% --- Cajas de información ---
+\newtcolorbox{infobox}{
+    colback=infocolor!10,
+    colframe=infocolor,
+    coltitle=infocolor,
+    title=\textbf{Información Técnica},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{warningbox}{
+    colback=warningcolor!10,
+    colframe=warningcolor,
+    coltitle=warningcolor,
+    title=\textbf{Consideración Importante},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{tipbox}{
+    colback=successcolor!10,
+    colframe=successcolor,
+    coltitle=successcolor,
+    title=\textbf{Nota Técnica},
+    fonttitle=\bfseries
+}
+
+\begin{document}
+
+% Reduce overfull/underfull hbox en párrafos y tablas
+\sloppy
+% Ajustar interlineado del documento (reduce ligeramente el espacio entre líneas)
+\setstretch{0.95}
+
+% --- PORTADA PERSONALIZADA ---
+\thispagestyle{empty}
+\begin{titlepage}
+    \centering
+    \vspace*{0.1cm}
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+    {\Large\textbf{DRIVER ROS PARA SPHERO}}\\[0.5cm]
+    {\Large\textbf{Laboratorio de Robótica de Enjambres}}\\[0.5cm]
+    {\Large\textbf{de la Universidad de Nariño}}\\[0.5cm]
+    \includegraphics[width=0.5\textwidth]{images/Logos.png}\\[0.5cm]
+    \vfill
+    %{\normalsize Autores:}\\[0.2cm]
+    \large{\textbf{Brayan Stiven López-Méndez}}\\
+    \url{bsmendez24B@udenar.edu.co}\\
+    Ing. Electrónico - Estudiante Maestría en Ingeniería Electrónica\\
+    Universidad de Nariño\\
+    \vfill
+    \large{\textbf{Wilson Olmedo Achicanoy-Martínez, PhD.}}\\
+    \url{wilachic@udenar.edu.co}\\
+    Docente Tiempo Completo - Departamento de Electrónica\\
+    Universidad de Nariño
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+\end{titlepage}
+
+% --- ÍNDICES ---
+\newpage
+
+% Personalización de títulos de índices
+\renewcommand{\contentsname}{\Huge\textbf{Índice general}\vspace{-0.1cm}}
+\renewcommand{\listfigurename}{\Huge\textbf{Índice de Figuras}\vspace{-0.1cm}}
+\renewcommand{\listtablename}{\Huge\textbf{Índice de Tablas}\vspace{-0.1cm}}
+
+% Índice general
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\tableofcontents
+\newpage
+
+% Índice de figuras
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\listoffigures
+\newpage
+
+% Índice de tablas
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\listoftables
+\newpage
+
+% Página en blanco con encabezado y pie de página
+\thispagestyle{fancy}
+\mbox{} % Caja vacía para forzar la página
+\newpage
+
+% Comando para que cada sección (capítulo) inicie en nueva página
+\newcommand{\sectionbreak}{\clearpage}
+
+
+% =======================
+\section{Introducción}
+
+\justifying
+En este documento se presenta el análisis técnico del desarrollo del \textit{Driver} ROS \cite{ROSWebsite} para el robot Sphero RVR \cite{Sphero_RVR_Plus}, que es necesario para lograr su acceso y control desde cualquier plataforma didáctica de robótica. En este caso, el driver desarrollado permite la integración del Sphero RVR al Laboratorio de Robótica de Enjambres de la Universidad de Nariño. El análisis abarca desde los fundamentos arquitectónicos hasta la implementación práctica, integrando conocimientos de robótica, programación asíncrona y sistemas embebidos.
+
+
+\subsection{Objetivos del Driver ROS}
+
+El driver desarrollado tiene como objetivos principales la integración asíncrona del SDK de Sphero con el middleware \cite{IBM_WhatIs_Middleware} ROS síncrono, implementando control de movimiento con conversión cinemática. Adicionalmente, se configura el streaming continuo de sensores (IMU, Odometría, Color) y mecanismos de parada de emergencia, asegurando compatibilidad con herramientas estándar de ROS para mantener la interoperabilidad del laboratorio desde donde se usan los robots Sphero.
+
+
+\subsection{Desafíos Técnicos Principales}
+
+El desarrollo del driver enfrenta varios desafíos técnicos que requieren atención. La concurrencia híbrida representa el desafío principal, involucrando la integración entre asyncio (Python) y rospy (multihilo), lo cual demanda un diseño de una arquitectura adecuada. Las limitaciones de comunicación impuestas por el puerto UART a 115200 baudios actúan como cuello de botella del sistema, requiriendo optimización del throughput y gestión del ancho de banda. La conversión cinemática entre unidades ROS (en unidades de m/s y rad/s) y la escala nativa del RVR (0-255) requiere precisión matemática para garantizar un control fiable. Finalmente, la robustez operacional demanda implementación de mecanismos para el manejo de fallos de comunicación y estados de error.
+
+
+\newpage
+
+
+\section{Requisitos y Contexto Tecnológico}
+
+
+\subsection{Propósito y Requisitos Operacionales del Proyecto}
+
+Los requisitos primarios para el desarrollo del driver implican que se asegure una comunicación confiable y de baja latencia para el control de movimiento, la publicación continua y oportuna de datos sensoriales (Odometría, IMU, Color) y la implementación de un mecanismo de parada lógica robusta. Sin este driver es imposible acceder y controlar a los robots Sphero dentro de una arquitectura de laboratorio.
+
+Dada la naturaleza del Sphero RVR, la plataforma de despliegue principal que se utiliza es un computador de una sola tarjeta de tipo Raspberry Pi \cite{RaspberryPi_Website}, que se comunica con el RVR a través del puerto UART de 4 pines. La necesidad de integrar la concurrencia del hardware periférico (como el puerto serial y posibles dispositivos externos) con el marco de ROS eleva el nivel de complejidad técnica del driver.
+
+
+\subsection{Descripción de la Plataforma RVR (Hardware, Sensores y API)}
+
+El Sphero RVR \cite{Sphero_RVR_Plus} es un robot tipo rover sobre orugas, reconocido por su robustez y su capacidad para la personalización y la expansión de hardware de terceros (Raspberry Pi, Arduino, micro:bit) mediante su placa de expansión y puertos de comunicación.
+
+La comunicación de bajo nivel con el RVR se establece a través del puerto UART, operando a una tasa de 115200 baudios. Es importante para la instalación física asegurar que la conexión se realice correctamente, enlazando el pin de transmisión (TX) del host al pin de recepción (RX) del RVR, y viceversa, como se muestra en la Figura \ref{fig:uart_connection}. Adicionalmente, existe el requisito eléctrico importante de que el puerto UART del RVR no es tolerante a señales de 5~V. Cualquier SBC (\textit{Single Board Computer}) que se conecte a este puerto debe operar con niveles lógicos de 3,3~V o incorporar un conversor de nivel para evitar daños al robot.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/image.png}
+    \caption{Conexión UART entre SBC y Sphero RVR. Fuente: elaboración propia.}
+    \label{fig:uart_connection}
+\end{figure}
+
+
+\subsection{Unidades Estándar de la API Sphero RVR}
+
+La API del Sphero RVR se adecúa a la consistencia, utilizando unidades estándar como metros/segundo (m/s) para la velocidad lineal y grados para el ángulo. Sin embargo, los comandos de movimiento de bajo nivel, como \textit{Drive With Heading} y \textit{Raw Motors}, utilizan parámetros de velocidad definidos en una escala de 8 bits de 0 a 255. Esta escala está relacionada con la representación de memoria y no corresponde directamente a unidades físicas.
+
+La velocidad máxima del RVR varía según la versión, alcanzando aproximadamente 2~m/s para el RVR estándar y 1,5~m/s para el RVR+ (que prioriza el torque). Esta disparidad entre las unidades estándar de ROS (geometry\_msgs/Twist en m/s y rad/s) y la escala nativa del RVR (0-255) requiere que el driver implemente una función de conversión cinemática y escalamiento precisa.
+
+\begin{warningbox}
+\textbf{Importante:} El driver debe utilizar un parámetro configurable para manejar las diferencias de escala y asegurar que los comandos ROS se traduzcan correctamente a la escala 0-255 del RVR.
+\end{warningbox}
+
+
+\newpage
+
+
+\section{Análisis Arquitectónico del SDK de Sphero y la Concurrencia}
+
+
+\subsection{Arquitectura del SDK de Python de Sphero (El Paradigma asyncio)}
+
+El SDK oficial de Python para el RVR está diseñado para ser flexible, ofreciendo dos paradigmas de programación distintos: asyncio y observer. La elección del paradigma asyncio es importante para proyectos de robótica, ya que proporciona una arquitectura de programación asíncrona que permite manejar múltiples operaciones concurrentes de manera eficiente.
+
+El paradigma asyncio se basa en el concepto de programación asíncrona, donde las operaciones de entrada/salida (I/O) no bloquean la ejecución del programa principal. En el contexto del RVR, esto significa que el driver puede enviar comandos de movimiento, recibir datos de sensores y manejar eventos de comunicación de forma concurrente, sin esperar a que cada operación se complete secuencialmente. Esta arquitectura es particularmente ventajosa para sistemas robóticos que deben mantener múltiples flujos de datos activos simultáneamente, como la telemetría continua de sensores IMU, la recepción de datos de odometría y el procesamiento de comandos de control en tiempo real.
+
+La implementación asyncio utiliza corrutinas (funciones asíncronas) que pueden ser pausadas y reanudadas, permitiendo que el programa maneje múltiples tareas concurrentes en un solo hilo de ejecución. Esto contrasta con el paradigma observer, que se basa en callbacks y eventos, ofreciendo un modelo de programación más tradicional pero potencialmente menos eficiente para aplicaciones que requieren alta concurrencia.
+
+El enfoque asyncio utiliza la librería asíncrona estándar de Python para gestionar el envío y la recepción de datos desde el RVR. Esto se vuelve particularmente relevante al integrar dispositivos externos, ya que las operaciones de entrada/salida (I/O), como la comunicación serial con el RVR o la lectura de otros sensores montados en la Raspberry Pi, a menudo bloquean la ejecución del programa. El uso de asyncio permite que el código continúe ejecutándose de manera concurrente, en lugar de esperar a que la I/O se complete.
+
+
+\subsection{Justificación de la Elección del SDK Asíncrono para Robótica}
+
+En robótica, la necesidad de manejar múltiples flujos de datos y comandos de manera concurrente (sensores, control y comunicaciones de red) es importante; y aunque Python, debido a su Global Interpreter Lock (GIL) no permite una ejecución paralela verdadera para tareas intensivas en CPU, el marco asyncio es efectivo en la gestión de tareas limitadas por I/O, que constituyen la mayoría de las interacciones en un driver de robot móvil (comunicación serial, tópicos ROS).
+
+Si por el contrario, se utilizara un enfoque síncrono tradicional, la latencia inherente a la comunicación UART a 115200 baudios podría bloquear el hilo principal del driver, retrasando la lectura de nuevos comandos ROS o la publicación de datos sensoriales. Al adoptar la versión asyncio del SDK, el driver puede programar las llamadas al RVR (p. ej. await rvr.set\_all\_leds()) sin detener el flujo de ejecución, logrando una baja latencia percibida en la respuesta del sistema.
+
+
+\subsection{Interfaz de Comunicación de Bajo Nivel (UART Serial)}
+
+La conectividad del driver se basa en el puerto UART de 4 pines del RVR, que proporciona una comunicación serial bidireccional a 115200 baudios. Esta interfaz de bajo nivel requiere una configuración específica del sistema operativo para garantizar el acceso adecuado al hardware y la estabilidad de la comunicación.
+
+La configuración del sistema operativo implica varios pasos críticos que deben completarse antes de la ejecución del driver. Primero, es necesario desactivar la consola de inicio de sesión que utiliza el puerto serial por defecto en sistemas Linux, ya que esta funcionalidad puede interferir con la comunicación del driver. Segundo, el usuario que ejecuta el nodo ROS debe tener permisos de acceso al dispositivo serial, lo cual se logra típicamente añadiendo el usuario al grupo dialout del sistema. Sin estos pasos preliminares de configuración, el driver no podrá acceder al puerto serial (generalmente /dev/ttyS0 o /dev/ttyUSB0) y el script de inicialización del SDK de Sphero fallará durante la fase de conexión.
+
+Esta configuración del sistema es un requisito previo importante para el funcionamiento del driver, ya que establece los permisos y la disponibilidad del puerto serial necesarios para la comunicación con el RVR. Los detalles específicos de esta configuración se pueden consultar en sitios o documentos de instrucciones paso a paso para diferentes distribuciones de Linux y configuraciones del hardware del Sphero \cite{Sphero_RVR_Plus}.
+
+\begin{infobox}
+\textbf{Configuración Crítica:} El componente de comunicación serial del SDK (SerialAsyncDal) está intrínsecamente ligado al bucle de eventos asíncrono (asyncio.get\_event\_loop()) para su operación. Por lo tanto, el driver ROS debe integrar y gestionar este bucle de eventos de manera efectiva para operar el RVR.
+\end{infobox}
+
+
+\newpage
+
+
+\section{Diseño de la Arquitectura del Driver ROS (atriz\_rvr\_driver)}
+
+
+\subsection{Selección del Middleware: ROS 1 (Noetic) vs. ROS 2 (RCLPY)}
+
+Para el desarrollo del driver, la decisión entre ROS 1 (rospy) \cite{ROSWebsite} y ROS 2 (rclpy) \cite{Macenski2022ROS2} se fundamenta en la madurez del ecosistema y la disponibilidad de recursos de desarrollo. La elección de ROS 1 (Noetic) se justifica por su amplia documentación, abundancia de librerías disponibles y extenso soporte comunitario que facilita el desarrollo y la resolución de problemas.
+
+ROS 1 cuenta con un ecosistema maduro que incluye miles de paquetes desarrollados por la comunidad durante más de una década, proporcionando soluciones probadas para una amplia gama de aplicaciones robóticas. Esta madurez se traduce en documentación exhaustiva, tutoriales detallados y ejemplos de código que aceleran significativamente el proceso de desarrollo. Además, la compatibilidad con plataformas SBC como Raspberry Pi está bien establecida, con configuraciones optimizadas y guías de instalación específicas.
+
+Aunque ROS 2 ofrece ventajas arquitectónicas significativas, especialmente una mejor integración nativa con el ecosistema de asyncio a través de constructores como AsyncioExecutor, su ecosistema aún está en proceso de maduración. ROS 2 presenta menos paquetes disponibles, documentación más limitada y una curva de aprendizaje más pronunciada, lo que puede incrementar el tiempo de desarrollo y la complejidad de implementación para proyectos universitarios.
+
+
+\subsection{Selección del Lenguaje de Programación: Python vs. C++}
+
+Una vez establecida la elección de ROS 1 como middleware, la decisión del lenguaje de programación se basa en el balance entre rendimiento y facilidad de desarrollo. En términos de rendimiento puro, si el lazo de control tuviera que operar a alta frecuencia (p. ej. 100~Hz o más), el lenguaje C++ (roscpp) \cite{roscpp_ROSWiki} tendría ventajas debido a la ausencia de las restricciones de rendimiento impuestas por el GIL de Python.
+
+Sin embargo, debido a que el cuello de botella del sistema es la tasa de comunicación serial (115200 baudios), el rendimiento de Python es aceptable para la capa de control de alto nivel. Esta característica del sistema permite priorizar la facilidad de desarrollo y mantenimiento que ofrece Python, especialmente en el contexto académico donde la legibilidad del código y la rapidez de implementación son factores importantes.
+
+La elección de Python se ve reforzada por su compatibilidad nativa con el SDK asyncio de Sphero, que está desarrollado en Python, eliminando la necesidad de wrappers o interfaces adicionales. Esta integración directa simplifica significativamente la implementación del driver y reduce la complejidad del sistema.
+
+
+\subsection{Patrones de Comunicación ROS (Tópicos, Servicios, Actions)}
+
+El driver debe adherirse a los patrones de comunicación de ROS para garantizar la interoperabilidad. Los tópicos son apropiados para flujos de datos continuos (sensores, estado del robot, comandos de velocidad). Los servicios se reservan para llamadas de procedimiento remoto que son rápidas y bloqueantes (como consultas de estado o comandos de calibración).
+
+El driver propuesto aquí mapea las capacidades del RVR a las interfaces estándar de ROS (ver Tabla \ref{tab:mapeo_rvr_ros}), facilitando la integración con paquetes de navegación existentes (Move Base, AMCL, SLAM Toolbox).
+
+\begin{table}[htbp]
+\centering
+\caption{Mapeo Integral de Funcionalidades RVR a Interfaz ROS Implementadas}
+\label{tab:mapeo_rvr_ros}
+\begin{tabular}{|p{0.20\textwidth}|p{0.20\textwidth}|p{0.10\textwidth}|p{0.15\textwidth}|p{0.12\textwidth}|}
+\hline
+\textbf{Funcionalidad RVR} & \textbf{API Sphero} & \textbf{Tipo ROS} & \textbf{Mensaje ROS} & \textbf{Frecuencia} \\
+\hline
+\multirow{2}{*}{Control Movimiento} & \funcion{rawMotors} (Recomendado) & Tópico (Sub) & \code{geometry\_msgs/Twist} & 10-50 Hz \\
+\cline{2-5}
+& \funcion{driveWithHeading} & Tópico (Sub) & \code{atriz\_rvr\_msgs/DegreesTwist} & 10-50 Hz \\
+\hline
+\multirow{2}{*}{Odometría} & Sensor Streaming (IMU) & Tópico (Pub) & \code{nav\_msgs/Odometry} & 20-30 Hz \\
+\cline{2-5}
+& Encoders + Fusión & Tópico (Pub) & \code{nav\_msgs/Odometry} & 20-30 Hz \\
+\hline
+Estado Batería & \funcion{getBatteryPercentage()} & Servicio & \code{std\_srvs/Empty} & On-demand \\
+\hline
+\multirow{2}{*}{Datos IMU} & Acelerómetro & Tópico (Pub) & \code{sensor\_msgs/Imu} & 20-30 Hz \\
+\cline{2-5}
+& Giroscopio & Tópico (Pub) & \code{sensor\_msgs/Imu} & 20-30 Hz \\
+\hline
+Detección Colores & Color Sensor & Tópico (Pub) & \code{atriz\_rvr\_msgs/ColorDetection} & 10 Hz \\
+\hline
+Luz Ambiental & Ambient Light Sensor & Tópico (Pub) & \code{sensor\_msgs/Illuminance} & 10-20 Hz \\
+\hline
+Estado Robot & System Status & Tópico (Pub) & \code{atriz\_rvr\_msgs/RvrStatus} & 5-10 Hz \\
+\hline
+Detección Infrarroja & IR Sensor & Tópico (Pub) & \code{sensor\_msgs/Range} & 10 Hz \\
+\hline
+Control LEDs & \funcion{setAllLeds()} & Servicio & \code{atriz\_rvr\_msgs/LedControl} & On-demand \\
+\hline
+Reset Orientación & \funcion{resetYaw()} & Servicio & \code{std\_srvs/Empty} & On-demand \\
+\hline
+Parada Emergencia & \funcion{emergencyStop()} & Tópico (Sub) & \code{std\_msgs/Empty} & On-demand \\
+\hline
+Estado Sistema & \funcion{getSystemInfo()} & Servicio & \code{atriz\_rvr\_msgs/SystemInfo} & On-demand \\
+\hline
+Wake/Sleep & \funcion{wake()}/\funcion{sleep()} & Servicio & \code{std\_srvs/Empty} & On-demand \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Notas sobre el Mapeo:}
+\begin{itemize}
+\item \textbf{Frecuencias Recomendadas:} Las frecuencias están optimizadas para evitar la saturación del puerto UART a 115200 baudios, considerando el ancho de banda limitado y la necesidad de mantener comandos de control prioritarios.
+\item \textbf{Mensajes Personalizados:} Los mensajes \code{atriz\_rvr\_msgs} encapsulan funcionalidades específicas del RVR que no tienen equivalentes directos en mensajes estándar de ROS.
+\item \textbf{Compatibilidad:} El uso de mensajes estándar (\code{geometry\_msgs/Twist}, \code{sensor\_msgs/Imu}) garantiza la interoperabilidad inmediata con herramientas de navegación existentes.
+\item \textbf{Patrones de Comunicación:} Los tópicos se utilizan para flujos de datos continuos, mientras que los servicios se reservan para operaciones bajo demanda que requieren confirmación.
+\end{itemize}
+
+
+\subsection{Arquitectura Integral de Capas del Driver}
+\label{sec:arquitectura_capas}
+
+La arquitectura del driver se fundamenta en el principio de separación de responsabilidades para resolver la dualidad entre el entorno síncrono de rospy y el entorno asíncrono del SDK de RVR. Esta separación permite manejar eficientemente las diferentes velocidades de procesamiento y los patrones de comunicación de cada componente del sistema.
+
+La propuesta arquitectónica implementa una estructura de tres capas que actúan como interfaces de abstracción, facilitando el mantenimiento del código y la depuración de problemas específicos. Cada capa tiene responsabilidades bien definidas y se comunica con las capas adyacentes a través de interfaces estandarizadas, reduciendo el acoplamiento entre componentes y mejorando la modularidad del sistema.
+
+
+\subsubsection{Capa 1: Comunicación Física y Protocolo (Núcleo C++/Python Híbrido)}
+
+Esta capa constituye la interfaz más cercana al hardware del RVR, implementando la comunicación de bajo nivel mediante el SDK oficial de Sphero. Su responsabilidad principal es gestionar la comunicación serial UART, el manejo de buffers de entrada/salida y la implementación de la lógica de serialización y deserialización de paquetes Sphero API.
+
+\textbf{Implementación Híbrida:} Debido a la necesidad de mínima latencia y máxima eficiencia en el procesamiento de datos a 115200 baudios, esta capa combina elementos de C++ para el núcleo del protocolo con Python para la integración con el SDK de Sphero. La capa encapsula la instancia de SpheroRvrAsync y gestiona el bucle de eventos de asyncio que coordina todas las operaciones asíncronas del sistema.
+
+\textbf{Responsabilidades Técnicas:} La comunicación física a través del puerto UART incluye la lectura y escritura de datos seriales, el manejo de errores de transmisión y la gestión de timeouts de comunicación. Maneja la validación del checksum y la lógica de reintento ante errores de transmisión. Además, ejecuta todos los comandos asíncronos del SDK, como el control de movimiento, la configuración de LEDs y la activación de sensores.
+
+\textbf{Gestión de Sensor Streaming:} Un aspecto crítico de esta capa es la gestión del Sensor Streaming del RVR, que permite la recepción continua de datos de sensores sin bloqueo del sistema principal. Esta funcionalidad incluye la configuración de las tasas de muestreo, el filtrado de datos redundantes y la notificación a las capas superiores cuando nuevos datos están disponibles.
+
+
+\subsubsection{Capa 2: Abstracción del Robot y Sincronización (HAL/Adapter)}
+
+Esta capa actúa como un intermediario crítico entre el entorno asíncrono de la Capa 1 y el entorno síncrono de la Capa 3, implementando un mecanismo de sincronización thread-safe que permite el intercambio de datos entre hilos con diferentes velocidades de procesamiento.
+
+\textbf{Patrón Adapter:} Actúa como un shim o mediador, exponiendo comandos de alto nivel (p. ej. \code{move\_forward(speed)}, \code{set\_led\_color(r, g, b)}) que son independientes de los identificadores binarios del protocolo Sphero (Device ID y Command ID). Aquí se aplica el Patrón Adapter para traducir las peticiones de alto nivel en las secuencias de paquetes binarios requeridas por la Capa 1.
+
+\textbf{State Buffer Thread-Safe:} Esta capa implementa un buffer de estado que almacena de forma segura el último comando ROS recibido (\code{geometry\_msgs/Twist}) y los datos sensoriales más recientes leídos por la Capa 1. El uso de estructuras de datos thread-safe, como RealtimeBuffer o implementaciones similares, es un patrón establecido en ROS para manejar la comunicación entre componentes que operan a diferentes frecuencias.
+
+\textbf{Protección contra Condiciones de Carrera:} La implementación del buffer incluye mecanismos de protección contra condiciones de carrera, garantizando que los datos escritos por un hilo sean consistentes cuando son leídos por otro hilo. Además, proporciona métodos de acceso que permiten a las capas superiores obtener los datos más recientes disponibles sin bloquear la ejecución del sistema.
+
+
+\subsubsection{Capa 3: Aplicación y Lógica de Control ROS (Python)}
+
+Esta capa representa el nodo principal de ROS que interactúa con el ecosistema ROS y proporciona la interfaz estándar para otros componentes del sistema. Es la capa de usuario que utiliza la interfaz de alto nivel proporcionada por la Capa 2 para desarrollar algoritmos complejos, como la navegación autónoma, la integración con sistemas externos (ROS) o el desarrollo de interfaces web.
+
+\textbf{Control de Alto Nivel:} Esta capa implementa la lógica de control de alto nivel y gestiona la comunicación con otros nodos ROS a través de tópicos, servicios y parámetros. Las responsabilidades principales incluyen la suscripción a tópicos de comando (\code{/cmd\_vel}), la conversión de unidades cinemáticas entre el formato estándar de ROS (m/s, rad/s) y la escala nativa del RVR (0-255), y la actualización del State Buffer con los comandos procesados.
+
+\textbf{Publicación de Datos Sensoriales:} Publica continuamente los datos de sensores (Odometría, IMU, Color) obtenidos desde la Capa 2, manteniendo la información actualizada para otros componentes del sistema. Esta funcionalidad es esencial para la interoperabilidad con herramientas estándar de ROS y el ecosistema de navegación.
+
+\textbf{Lógica de Seguridad:} Esta capa también implementa la lógica de control de seguridad, incluyendo mecanismos de timeout para comandos de movimiento, verificación de límites de velocidad y gestión de estados de error. La implementación de estos mecanismos garantiza que el robot opere de manera segura y predecible, incluso en condiciones de fallo de comunicación o datos inconsistentes.
+
+
+\subsubsection{Justificación de la Arquitectura Híbrida}
+
+La elección de un enfoque bilingüe (C++/Python) no es arbitraria, sino una práctica estándar en la robótica de alto rendimiento. La justificación de C++ para el núcleo del driver (Capa 1) reside en su capacidad para ofrecer un rendimiento determinista y en tiempo real, esencial para la manipulación directa del hardware y el protocolo serial. C++ es el lenguaje predominante en la robótica industrial y de sistemas operativos, y su eficiencia en el manejo de memoria y threads lo hace ideal para tareas sensibles al tiempo.
+
+Por otro lado, Python se justifica para la Capa de Aplicación (Capa 3) debido a su simplicidad, rápido prototipado y amplia disponibilidad de librerías para tareas complejas como la inteligencia artificial, el procesamiento de datos de sensores y la integración con marcos de software como ROS. El SDK oficial de Sphero está implementado en Python, lo que facilita la adaptación, retroalimentación y escalabilidad.
+
+
+\newpage
+
+
+\section{Estrategia de Concurrencia y Sincronización Síncrono-Asíncrono}
+
+
+\subsection{El Desafío de Integrar rospy (Síncrono) con asyncio (Event Loop)}
+
+El principal desafío técnico radica en que los callbacks de suscripción de rospy son síncronos y se ejecutan en hilos separados gestionados por ROS. Si un desarrollador intentara utilizar directamente una función await dentro de un callback de ROS, provocaría un error, o, si la operación fuera síncrona, bloquearía el hilo de procesamiento de mensajes de ROS. Para utilizar el SDK de Sphero (que es intrínsecamente asíncrono) dentro de un nodo rospy, el bucle de eventos de asyncio debe ejecutarse en un entorno que no interfiera con el ciclo de spinning de ROS.
+
+
+\subsection{Implementación de un Bucle de Eventos Dedicado en Python}
+
+La solución arquitectónica exige que el bucle de eventos de asyncio se inicialice y ejecute en su propio 
+hilo dedicado, separado del proceso principal que ejecuta rospy.spin(). Aunque la práctica recomendada en aplicaciones Python autónomas es usar asyncio.run() para gestionar el ciclo de vida del bucle, para la coexistencia con ROS, el bucle debe iniciarse manualmente en el hilo secundario (usando \code{loop.run\_forever()}) para permitir que la Capa 1 (RVR Core Handler) opere continuamente.
+
+
+\subsection{Patrón de Paso de Mensajes (Delegación Asíncrona)}
+
+Cuando la Capa 3 recibe un mensaje \code{/cmd\_vel} (en un hilo síncrono de ROS), el driver primero realiza la conversión cinemática y luego actualiza el State Buffer (Capa 2). La ejecución del comando Sphero no ocurre en el hilo del callback de ROS.
+
+En su lugar, el bucle de eventos de asyncio (corriendo en el hilo dedicado) ejecuta un coroutine periódico conocido como el Heartbeat Loop. Este coroutine lee el comando más reciente del State Buffer y programa su envío al RVR mediante \code{loop.create\_task()}. Este mecanismo es clave: \code{create\_task()} devuelve inmediatamente al hilo que lo llama, permitiendo que el hilo de ROS continúe procesando mensajes sin esperar la latencia de la comunicación UART.
+
+\begin{tipbox}
+\textbf{Heartbeat Loop:} Este patrón de delegación es importante para el control de flujo. Si los comandos de velocidad llegan a una alta frecuencia (p. ej. 50~Hz) pero el RVR solo puede procesar comandos a 10~Hz debido a las limitaciones de la UART, la delegación a través del Heartbeat evita que el bucle de eventos se sature con tareas de movimiento pendientes.
+\end{tipbox}
+
+
+\subsection{Consideraciones de Latencia y Rendimiento}
+
+El uso de asyncio se centra en la optimización de la concurrencia, no necesariamente en el rendimiento puro, el cual podría estar mejor servido por C++. Sin embargo, dado que el límite de velocidad de la comunicación es la UART a 115200 baudios, el beneficio de asyncio radica en asegurar que la espera de la respuesta serial no afecte otras funciones del driver. La baja latencia para tareas de control se logra al utilizar \code{create\_task}, que programa la I/O sin esperar, permitiendo al driver procesar rápidamente cualquier evento de emergencia o nuevos comandos.
+
+
+\newpage
+
+
+\section{Implementación del Subsistema de Movimiento y Control}
+
+El subsistema de movimiento y control es el núcleo funcional del driver ROS para el Sphero RVR, implementando la traducción entre los estándares de comunicación de ROS y la API nativa del robot. Este subsistema se caracteriza por su arquitectura híbrida que integra paradigmas de concurrencia síncronos (rospy) y asíncronos (asyncio), garantizando tanto la interoperabilidad con el ecosistema ROS como la eficiencia en la comunicación serial con el hardware del RVR.
+
+
+\subsection{Definición del Tópico de Comando Estándar: /cmd\_vel}
+
+El driver debe seguir el estándar de facto de la robótica móvil, suscribiéndose al tópico \code{/cmd\_vel}, que utiliza el mensaje \code{geometry\_msgs/Twist}. Este mensaje transmite la velocidad lineal deseada (linear.x, en el eje X) en m/s y la velocidad angular deseada (angular.z, sobre el eje Z) en rad/s. Para el robot diferencial (o tipo oruga) RVR, solo se utilizan los componentes linear.x (hacia adelante/atrás) y angular.z (rotación).
+
+
+\subsubsection{Arquitectura de Control Dual}
+
+El driver implementa un sistema de control dual que proporciona flexibilidad operacional para el usuario:
+
+\textbf{Comandos Estándar ROS:} Suscripción a \code{geometry\_msgs/Twist}, con conversión automática de unidades de rad/s a deg/s mediante la fórmula $\omega_{deg} = \omega_{rad} \times (180/\pi)$. Esta modalidad es ideal para integración con algoritmos de navegación estándar de ROS.
+
+\textbf{Comandos Intuitivos:} Suscripción a un mensaje personalizado (DegreesTwist), que elimina la necesidad de conversión manual de unidades angulares. Esta modalidad es más apropiada para usuarios que trabajan directamente con la documentación nativa de Sphero, donde las velocidades angulares se especifican en grados por segundo.
+
+
+\subsubsection{Priorización de Comandos y Multiplexación}
+
+En entornos de robótica complejos, múltiples nodos (teleoperación por joystick y planificador de navegación) pueden intentar publicar en el tópico de movimiento. Para evitar comandos conflictivos, el driver asume el uso de un multiplexor de Twist externo (\code{twist\_mux}), suscribiéndose únicamente a la salida priorizada del multiplexor (p. ej. \code{/rvr/cmd\_vel\_in}). Esta arquitectura garantiza que solo la fuente de comando de más alta prioridad controle el robot en un momento dado, evitando la implementación de una lógica de arbitraje compleja dentro del driver.
+
+
+\subsection{Conversión Cinemática: De Velocidad Lineal/Angular (Twist) a Velocidad/Dirección (RVR)}
+
+El aspecto más técnico del driver es la conversión de unidades de ROS a la escala nativa del RVR (0-255). Esta conversión es fundamental para lograr un control preciso del movimiento, especialmente en aplicaciones de navegación autónoma.
+
+
+\subsubsection{Fórmula de Conversión Lineal}
+
+La fórmula de conversión para la velocidad lineal es:
+
+$$speed\_rvr = \frac{linear\_x}{max\_speed} \times 255$$
+
+Donde \code{max\_speed} es la velocidad máxima configurada según la versión del RVR:
+
+\begin{itemize}
+    \item \textbf{RVR estándar}: 2,0~m/s (velocidad máxima teórica)
+    \item \textbf{RVR+}: 1,5~m/s (optimizado para torque y capacidad de carga)
+\end{itemize}
+
+Esta escala de 0-255 está directamente relacionada con la representación de memoria de 8 bits utilizada por el firmware del RVR y no corresponde directamente a unidades físicas, requiriendo un parámetro configurable para manejar las diferencias de escala entre las unidades estándar de ROS y la API nativa del RVR.
+
+
+\subsubsection{Conversión Angular y Cinemática Diferencial}
+
+Para la velocidad angular, el driver implementa la cinemática inversa diferencial para convertir comandos Twist estándar en velocidades diferenciales de las orugas izquierda y derecha. La conversión de unidades angulares sigue la fórmula:
+
+$$\omega_{deg/s} = \omega_{rad/s} \times \frac{180}{\pi}$$
+
+Donde $\omega_{rad/s}$ es la velocidad angular en radianes por segundo (estándar ROS) y $\omega_{deg/s}$ es la velocidad angular en grados por segundo (unidad esperada por la API \code{write\_rc\_si} de Sphero).
+
+
+\subsubsection{Preferencia Arquitectónica: rawMotors vs driveWithHeading}
+
+Para lograr una integración cinemática precisa, que se requiere para un control de navegación avanzado, la arquitectura favorece el uso del comando rawMotors sobre driveWithHeading.
+
+\textbf{driveWithHeading:} Utiliza el sistema de coordenadas interno del RVR (Heading, 0-359 grados), introduciendo una dependencia en la ``caja negra'' del firmware. Este enfoque, aunque más simple de implementar, reduce la precisión del control y limita la capacidad de implementar algoritmos de navegación sofisticados.
+
+\textbf{rawMotors:} Permite el control directo de las velocidades de las orugas izquierda y derecha (0-255), similar al control de un robot diferencial tradicional. Este enfoque requiere que el driver implemente explícitamente la cinemática inversa diferencial para mapear la entrada Twist ($linear\_x$, $angular\_z$) a las velocidades diferenciales de las orugas ($v\_left$, $v\_right$), logrando un control predecible y preciso (ver Tabla \ref{tab:mapeo_cinematico} y Tabla \ref{tab:parametros_movimiento}).
+
+
+\subsubsection{Implementación de la Cinemática Inversa Diferencial}
+
+La cinemática inversa diferencial para un robot de tipo oruga se implementa mediante las siguientes ecuaciones:
+
+$$v\_left = linear\_x - \frac{angular\_z \times track\_width}{2}$$
+$$v\_right = linear\_x + \frac{angular\_z \times track\_width}{2}$$
+
+Donde $track\_width$ es la distancia entre las orugas izquierda y derecha del RVR. Estas velocidades diferenciales se convierten posteriormente a la escala 0-255 mediante la fórmula de escalamiento lineal.
+
+\begin{table}[htbp]
+\centering
+\caption{Mapeo Cinemático Detallado del Subsistema de Movimiento (Raw Motors)}
+\label{tab:mapeo_cinematico}
+\begin{tabular}{|p{0.10\textwidth}|p{0.10\textwidth}|p{0.24\textwidth}|p{0.16\textwidth}|p{0.26\textwidth}|}
+\hline
+\textbf{Entrada ROS} & \textbf{Unidad ROS} & \textbf{Procesamiento Intermedio} & \textbf{Salida RVR} & \textbf{Algoritmo de Conversión} \\
+\hline
+Linear.x & m/s & Velocidad base para ambas orugas & uint8 (0-255) & $v_{base} = \frac{linear\_x}{max\_speed} \times 255$ \\
+\hline
+Angular.z & rad/s & Diferencia de velocidad entre orugas & Diferencia L/R & $v_{diff} = \frac{angular\_z \times track\_width}{2} \times \frac{255}{max\_speed}$ \\
+\hline
+Velocidad Izquierda & Calculada & $v_{left} = v_{base} - v_{diff}$ & uint8 (0-255) & Cinemática inversa diferencial \\
+\hline
+Velocidad Derecha & Calculada & $v_{right} = v_{base} + v_{diff}$ & uint8 (0-255) & Cinemática inversa diferencial \\
+\hline
+Dirección & Forward / Reverse & Modo de motor L/R & Motor Flags (0x1, 0x2) & Control del bit de dirección en API \\
+\hline
+Timeout & Segundos & Comando válido por tiempo limitado & Heartbeat Loop (500~ms) & Mecanismo de failsafe pasivo \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Parámetros de Configuración del Subsistema de Movimiento}
+\label{tab:parametros_movimiento}
+\begin{tabular}{|p{0.30\textwidth}|p{0.08\textwidth}|p{0.08\textwidth}|p{0.38\textwidth}|}
+\hline
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Unidad} & \textbf{Descripción} \\
+\hline
+\code{max\_speed} (RVR estándar) & 2.0 & m/s & Velocidad máxima teórica del RVR estándar \\
+\hline
+\code{max\_speed} (RVR+) & 1.5 & m/s & Velocidad máxima optimizada para torque \\
+\hline
+\code{track\_width} & 0.15 & m & Distancia entre orugas izquierda y derecha \\
+\hline
+UART Baud Rate & 115200 & bps & Velocidad de comunicación serial \\
+\hline
+Heartbeat Frequency & 2.0 & Hz & Frecuencia del bucle de mantenimiento \\
+\hline
+Command Timeout (RVR) & 2.0 & s & Timeout por defecto del firmware \\
+\hline
+Command Timeout (Driver) & 0.3 & s & Timeout agresivo del driver \\
+\hline
+Escala de Velocidad & 0-255 & bits & Representación de 8 bits del firmware \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Mantenimiento del Movimiento Continuo a través del Bucle de Corazón (Heartbeat Loop)}
+
+El RVR está diseñado con un mecanismo de seguridad inherente que hace que sus comandos de manejo (\code{drive\_with\_heading} y \code{raw\_motors}) caduquen automáticamente después de 2 segundos si no se vuelven a emitir. Para lograr un movimiento continuo, esencial para la navegación autónoma, el driver no puede depender de la llegada intermitente de mensajes \code{/cmd\_vel}.
+
+
+\subsubsection{Implementación del Heartbeat Loop}
+
+El driver implementa el Heartbeat Loop como una coroutine asíncrona dentro del bucle de eventos de asyncio (Capa 1). Este coroutine debe programarse para ejecutarse periódicamente, con un intervalo menor que el tiempo de espera del RVR (p. ej. cada 500~ms o 2~Hz). En cada iteración, el Heartbeat lee el último comando de movimiento del State Buffer (Capa 2) y lo reenvía al RVR, manteniendo el movimiento.
+
+
+\subsubsection{Mecanismo de Failsafe Pasivo}
+
+Este diseño tiene el beneficio adicional de ser un mecanismo de failsafe pasivo. Si el SBC host falla o el driver se cuelga, el Heartbeat Loop cesa y el RVR se detendrá automáticamente a los 2 segundos, previniendo movimientos descontrolados.
+
+
+\subsubsection{Control de Flujo y Gestión de Latencia}
+
+El Heartbeat Loop actúa como un mecanismo de control de flujo crítico. Si los comandos de velocidad llegan a una alta frecuencia (p. ej. 10~Hz) pero el RVR solo puede procesar comandos a 2~Hz debido a las limitaciones de la UART, la delegación a través del Heartbeat evita que el bucle de eventos se sature con tareas de movimiento pendientes. El Heartbeat actúa como un mecanismo de control de flujo, leyendo la última instrucción disponible en el buffer a una tasa fija y gestionable.
+
+
+\subsubsection{Timeout Agresivo para Seguridad}
+
+El driver utiliza una variable \code{cmd\_vel\_timeout} de 0,3 segundos, significativamente más baja que el timeout por defecto del RVR (2 segundos). Este timeout agresivo sirve como un mecanismo de detección de fallos del host o de pérdida de comunicación, asegurando la detención pasiva del robot con una latencia mínima.
+
+
+\subsection{Integración con la Arquitectura de Tres Capas}
+
+El subsistema de movimiento y control se integra directamente con la arquitectura de tres capas del driver (ver Sección~\ref{sec:arquitectura_capas} para detalles completos):
+
+\textbf{Capa 1 (Comunicación Física):} Gestiona la comunicación serial UART a 115200 baudios y ejecuta el Heartbeat Loop como coroutine asíncrona para mantener el movimiento continuo.
+
+\textbf{Capa 2 (State Buffer):} Almacena de forma thread-safe el último comando ROS recibido (Twist) y los datos sensoriales, permitiendo el intercambio eficiente entre el entorno síncrono de ROS y el asíncrono del RVR.
+
+\textbf{Capa 3 (Control ROS):} Implementa la conversión cinemática, suscripción a tópicos de comando (\code{/cmd\_vel}) y publicación continua de datos de sensores, actuando como interfaz estándar con el ecosistema ROS.
+
+
+\subsection{Sistema de Seguridad y Parada de Emergencia}
+
+La estrategia de parada lógica debe ser la más rápida posible. Si se detecta una condición de emergencia, el driver debe actualizar inmediatamente el State Buffer (Capa 2) con una velocidad lineal y angular de cero. Gracias a la arquitectura asíncrona, el Heartbeat Loop (ejecutándose a alta frecuencia en su propio hilo) puede recoger este comando de velocidad cero y enviarlo al RVR con una latencia mínima.
+
+
+% \subsubsection{Mensajes Personalizados para Funcionalidades Específicas}
+
+
+\newpage
+
+
+\section{Adquisición de Datos de Sensores y Estado del Robot}
+
+
+\subsection{Configuración de Sensor Streaming del RVR}
+
+La API del RVR permite la transmisión de datos de múltiples sensores. El driver debe inicializar esta función durante el arranque y es importante calibrar la frecuencia de transmisión de datos. Dado que la comunicación se realiza a través de UART a 115200 baudios, existe un riesgo de saturar el puerto serial si se solicita una tasa de streaming demasiado alta o si se solicitan demasiados puntos de datos simultáneamente. La saturación puede llevar a que el RVR deje de responder a los comandos, comprometiendo la operación. Se requiere establecer una frecuencia conservadora (p. ej. 20-30~Hz) y monitorear la latencia.
+
+
+\subsection{Mapeo de Sensores Nativos RVR a Tipos de Mensajes Estándar de ROS}
+
+Para lograr interoperabilidad, los datos sensoriales deben publicarse utilizando mensajes estándar de ROS:
+
+
+\subsubsection{IMU}
+
+Los datos de aceleración y velocidad angular (giroscopio) deben empaquetarse en el mensaje \code{sensor\_msgs/Imu}. Es importante que estos mensajes incluyan el campo header con un \code{frame\_id} definido (p. ej. \code{rvr\_imu\_link}) y un timestamp para la sincronización con otros nodos del sistema.
+
+
+\subsubsection{Odometría}
+
+La odometría (estimación de pose y velocidad) derivada de los encoders y la fusión sensorial interna del RVR debe publicarse en \code{nav\_msgs/Odometry}. Este tópico es necesario para la navegación y la localización.
+
+
+\subsection{Propuesta de Definición de Mensajes Personalizados (\code{atriz\_rvr\_msgs})}
+\label{sec:mensajes_personalizados}
+
+Para funcionalidades específicas del RVR o para comandos que no se ajustan al estándar \code{geometry\_msgs/Twist}, es necesario crear un paquete de mensajes personalizados (\code{atriz\_rvr\_msgs}).
+
+
+\subsubsection{atriz\_rvr\_msgs/RvrDrive.msg}
+
+Permite a los usuarios experimentados probar comandos directos del RVR, utilizando la escala nativa de 0-255, sin pasar por la conversión cinemática de Twist.
+
+
+\subsubsection{atriz\_rvr\_msgs/DegreesTwist.msg}
+
+Proporciona una interfaz intuitiva para comandos de movimiento en grados por segundo, eliminando la necesidad de conversión manual de unidades angulares. Este mensaje personalizado es más apropiado para usuarios que trabajan directamente con la documentación nativa de Sphero.
+
+\begin{lstlisting}[language=bash]
+# DegreesTwist.msg
+float64 linear_x    # Velocidad lineal en m/s
+float64 linear_y    # Velocidad lineal en m/s (no utilizada)
+float64 linear_z    # Velocidad lineal en m/s (no utilizada)
+float64 angular_x   # Velocidad angular en deg/s (no utilizada)
+float64 angular_y   # Velocidad angular en deg/s (no utilizada)
+float64 angular_z   # Velocidad angular en deg/s (principal)
+\end{lstlisting}
+
+
+\subsubsection{Servicios Implementados}
+
+El driver implementa varios servicios para control y monitoreo:
+
+\begin{itemize}
+    \item \textbf{Estado de Batería:} \code{/battery\_state} - Consulta el nivel de batería del RVR.
+    \item \textbf{Control de LEDs:} \code{/set\_leds} - Configura el color de los LEDs del robot.
+    \item \textbf{Reset de Odometría:} \code{/reset\_odom} - Reinicia la odometría del robot.
+    \item \textbf{Liberación de Emergencia:} \code{/release\_emergency\_stop} - Libera la parada de emergencia.
+    \item \textbf{Control de Sensor de Color:} \code{/enable\_color} - Habilita/deshabilita el sensor de color.
+    \item \textbf{Modo IR:} \code{/ir\_mode} - Configura el modo de comunicación infrarroja.
+\end{itemize}
+
+
+\subsubsection{atriz\_rvr\_msgs/ColorDetection.msg}
+
+Para la publicación de las lecturas del sensor de color, incluyendo el nivel RGB (\textit{red}, \textit{green}, \textit{blue}) y la interpretación de alto nivel del color detectado (p. ej. ``Yellow'', ``Teal'', ``Purple'').
+
+\begin{lstlisting}[language=bash]
+# ColorDetection.msg
+std_msgs/Header header
+uint8 red
+uint8 green
+uint8 blue
+string detected_color_name
+float32 certainty
+\end{lstlisting}
+
+
+\subsubsection{Servicio atriz\_rvr\_msgs/GetBatteryState.srv}
+
+Para consultar el estado de la batería a demanda, facilitando la integración con los estándares de monitoreo de energía de ROS, basado en la estructura de \code{sensor\_msgs/BatteryState}.
+
+
+\newpage
+
+
+\section{Robustez Operacional y Seguridad Lógica}
+\label{sec:seguridad_logica}
+
+
+\subsection{Mecanismos de Parada de Emergencia (E-Stop Lógico)}
+
+Es importante establecer la distinción de que el driver ROS solo puede implementar una parada lógica, la cual no sustituye a un sistema de seguridad de emergencia físico certificado (E-Stop de seguridad).
+
+Si se detecta una condición de emergencia, el driver debe actualizar inmediatamente el State Buffer (Capa 2) con una velocidad lineal y angular de cero. Gracias a la arquitectura asíncrona, el Heartbeat Loop (ejecutándose a alta frecuencia en su propio hilo) puede recoger este comando de velocidad cero y enviarlo al RVR con una latencia mínima.
+
+Además, el mecanismo de failsafe pasivo del RVR que detiene el movimiento, si no recibe comandos en 2 segundos, asegura que si el driver ROS falla por completo (p. ej. si el SBC se apaga), el robot no continuará rodando indefinidamente.
+
+
+\newpage
+
+
+\section{Análisis Integral de Riesgos y Estrategias de Mitigación}
+\label{sec:analisis_riesgos}
+
+Los riesgos que se deben considerar son los peligros y fallas posibles durante la operación real del Sphero RVR.
+
+
+\subsection{Riesgos Operacionales del Sistema}
+
+
+\subsubsection{Riesgo: Conflictos de Control Múltiple}
+
+\textbf{Fundamento:} El RVR permite el control desde múltiples fuentes (la aplicación Sphero EDU y el host SBC a través de UART). La documentación de Sphero advierte explícitamente que el envío de comandos conflictivos puede resultar en un comportamiento impredecible.
+
+\textbf{Mitigación:} Implementar un sistema de priorización exclusiva que otorgue al driver ROS la prioridad absoluta sobre el control del movimiento cuando está activo, prohibiendo la operación concurrente desde otras fuentes.
+
+
+\subsubsection{Riesgo: Estados de Sueño del RVR}
+
+\textbf{Fundamento:} El RVR posee estados de bajo consumo de energía que pueden interferir con la operación del driver. Si el robot está en modo de Soft Sleep (indicado por pulsos púrpuras cada 10 segundos), la mayor parte de su funcionalidad está deshabilitada.
+
+\textbf{Mitigación:} Integrar una lógica de inicialización robusta que detecte automáticamente este estado y utilice el comando \code{wake()} del SDK de Sphero para restaurar la funcionalidad completa del robot antes de intentar cualquier comando de movimiento o streaming de sensores.
+
+
+\subsection{Riesgos Técnicos de Implementación}
+
+
+\subsubsection{Riesgo: Degradación del Rendimiento por Saturación de UART}
+
+\textbf{Fundamento:} El ancho de banda limitado de 115200 bps puede saturarse si la telemetría del sensor (giroscopios, acelerómetros) se reporta a alta frecuencia.
+
+\textbf{Mitigación:} Implementar la priorización estricta de comandos de control sobre los streams de telemetría y obligar a la configuración de una tasa de muestreo (sampling rate) controlada en la capa de protocolo.
+
+
+\subsubsection{Riesgo: Inestabilidad en Componentes C++}
+
+\textbf{Fundamento:} Los cambios internos en el \code{RVR\_Protocol\_Handler} C++ pueden romper la compatibilidad con los bindings Python si la interfaz pública se modifica accidentalmente.
+
+\textbf{Mitigación:} Mantener una separación clara entre la interfaz pública y la implementación interna, asegurando que el código cliente de Python no dependa de los detalles de implementación interna.
+
+
+\subsubsection{Riesgo: Fugas de Memoria en Lógica Asíncrona de C++}
+
+\textbf{Fundamento:} La gestión compleja de buffers de comunicación y la naturaleza asíncrona de la interfaz aumentan el riesgo de fugas de memoria o double deletion.
+
+\textbf{Mitigación:} Utilizar técnicas modernas de gestión de memoria en C++ y asegurar que todos los recursos asignados sean liberados correctamente, especialmente en contextos de comunicación asíncrona.
+
+
+\subsubsection{Riesgo: Latencia Excesiva por Patrón asyncio.run()}
+
+\textbf{Fundamento:} El uso de \code{asyncio.run()} dentro de callbacks de ROS introduce bloqueo y latencia en el sistema de control.
+
+\textbf{Mitigación:} Implementar un bucle de eventos dedicado con delegación asíncrona para eliminar el bloqueo de hilos y mejorar la responsividad del sistema.
+
+
+\subsubsection{Riesgo: Fallos de Comunicación Serial}
+
+\textbf{Fundamento:} La comunicación UART a 115200 baudios es susceptible a interferencias y fallos de transmisión.
+
+\textbf{Mitigación:} Implementar mecanismos robustos de reintento, validación de checksum y recuperación automática de errores de comunicación.
+
+
+\subsubsection{Limitación Conocida: Arquitectura Híbrida}
+
+\textbf{Descripción:} El driver actual utiliza un enfoque pragmático que combina elementos funcionales y orientados a objetos, con algunas variables globales para mantener la simplicidad operacional.
+
+\textbf{Impacto:} Esta arquitectura híbrida, aunque funcionalmente completa, presenta limitaciones en términos de encapsulación y mantenibilidad a largo plazo.
+
+\textbf{Estado Actual:} El diseño está optimizado para la funcionalidad y estabilidad, priorizando la integración exitosa entre asyncio y rospy sobre la pureza arquitectónica.
+
+
+\subsection{Evaluación de Impacto y Priorización}
+
+Los riesgos operacionales (conflictos de control y estados de sueño) tienen un impacto directo en la funcionalidad básica del sistema y requieren mitigación inmediata. Los riesgos técnicos, aunque importantes para la robustez a largo plazo, pueden abordarse de manera incremental durante el desarrollo, siguiendo las mejores prácticas de ingeniería de software establecidas en la metodología ROS-XP \cite{RamirezBedoya2019ROSXP}.
+
+
+\newpage
+
+
+\section{Metodología de Desarrollo y Gestión del Proyecto}
+
+
+\subsection{Metodología ROS-XP: Marco Integral de Desarrollo}
+\label{sec:metodologia_ros_xp}
+
+Los proyectos de robótica en el ámbito universitario a menudo requieren una metodología ágil que se adapte al ciclo rápido de aprendizaje y la integración constante de hardware/software. Se adoptó la metodología ROS-XP \cite{RamirezBedoya2019ROSXP}, que combina la robustez de \textit{Extreme Programming} (XP) con la estructura modular de \textit{Robot Operating System} (ROS), proporcionando un marco integral para el desarrollo de sistemas robóticos complejos.
+
+
+\subsubsection{Fundamentos de la Metodología ROS-XP}
+
+La metodología ROS-XP integra los principios fundamentales de \textit{Extreme Programming} con las mejores prácticas específicas del desarrollo robótico, creando un enfoque adaptado a las necesidades únicas de proyectos que involucran hardware, software y sistemas embebidos.
+
+\textbf{Desarrollo Iterativo e Incremental:} El trabajo se divide en pequeñas iteraciones o sprints que abordan funcionalidades específicas y bien definidas. La primera iteración se enfoca en la conectividad UART y control básico de LEDs, estableciendo la comunicación fundamental con el hardware. Las iteraciones subsiguientes incorporan progresivamente el movimiento, lectura de sensores, streaming de datos y funcionalidades avanzadas de seguridad.
+
+\textbf{Integración y Pruebas Continuas:} La filosofía XP exige la validación constante del código, lo cual se traduce en el contexto de ROS-XP en la implementación de pruebas unitarias para todo método antes de que el código sea implementado en el sistema. Esta práctica es especialmente crítica en el desarrollo de drivers, donde los errores pueden resultar en daños al hardware o comportamientos impredecibles del robot.
+
+\textbf{Programación en Parejas:} Para componentes críticos como el parser de protocolo, la validación de checksum y la gestión de comunicación serial, se recomienda la programación en parejas para mejorar la calidad del código y reducir la probabilidad de errores. Esta práctica es particularmente valiosa en el desarrollo de software embebido donde la depuración puede ser compleja.
+
+\textbf{Refactoring Continuo:} Debe mantenerse como práctica constante para preservar el código limpio y bien estructurado a medida que se añaden nuevas funcionalidades. En el contexto del driver RVR, esto incluye la optimización de la arquitectura de capas, la mejora de la gestión de memoria y la simplificación de interfaces complejas.
+
+\textbf{Propiedad Colectiva del Código:} Permite que todos los miembros del equipo puedan modificar cualquier parte del código, promoviendo el conocimiento compartido y la responsabilidad distribuida. Esta práctica es esencial en proyectos universitarios donde múltiples estudiantes contribuyen al desarrollo.
+
+
+\subsubsection{Estructuración por Nodos y Responsabilidades}
+
+La modularidad es fundamental en la metodología ROS-XP. Siguiendo el concepto de división de trabajos por nodos, el driver se organiza en componentes con responsabilidades bien definidas y interfaces claras.
+
+\textbf{Nodo/Módulo \code{RVR\_Serial\_IO}:} Tiene la única responsabilidad de Entrada/Salida de datos crudos (bytes) al puerto UART. Este módulo encapsula toda la lógica de comunicación serial de bajo nivel, incluyendo la configuración del puerto, el manejo de buffers y la gestión de errores de transmisión.
+
+\textbf{Nodo/Módulo \code{RVR\_Protocol\_Handler}:} Es responsable del procesamiento, validación de checksum y manejo de errores del protocolo Sphero. Implementa el Sujeto del Patrón Observer, gestionando la distribución de datos de telemetría a múltiples consumidores de manera eficiente.
+
+\textbf{Nodo/Módulo \code{RVR\_API}:} Constituye la capa de control y comunicaciones de alto nivel, exponiendo los métodos utilizables por la aplicación Python. Este módulo proporciona una interfaz limpia y bien documentada para la integración con sistemas externos.
+
+
+\subsubsection{Trazabilidad Académica y Alineación Institucional}
+
+Esta estructura promueve la separación de responsabilidades y garantiza que la lógica de negocio no se mezcle con los detalles del hardware. Además, un proyecto universitario debe asegurar la trazabilidad académica. La estructura técnica de módulos y la metodología adoptada deben alinearse con las Fases de Análisis, Ejes Estratégicos y Componentes del Plan de desarrollo.
+
+
+\subsubsection{Patrones de Diseño Implementados en ROS-XP}
+
+El driver aplica implícitamente varios patrones para la integración, siguiendo las mejores prácticas de la metodología ROS-XP. El Patrón Adaptador (Adapter) se implementa mediante el \code{Atriz\_rvr\_node.py}, que actúa como un adaptador crucial transformando la interfaz asíncrona del Sphero SDK a la interfaz síncrona esperada por los callbacks de rospy. Los mensajes Twist y DegreesTwist representan el Patrón Command, encapsulando peticiones de movimiento para ser ejecutadas por el adaptador. La variable \code{is\_in\_emergency\_stop} constituye una implementación directa del Patrón State, condicionando el comportamiento del sistema basándose en una condición discreta. Finalmente, el uso de tópicos de ROS (\code{/cmd\_vel}, \code{/rvr/emergency\_stop}) implementa el Patrón Observer, donde los callbacks actúan como observadores de eventos asíncronos en la red ROS.
+
+
+\newpage
+
+
+\section{Evaluación de la Capacidad de Abstracción del Driver}
+\label{sec:evaluacion_abstraccion}
+
+
+\subsection{Análisis Arquitectónico Integral}
+
+El análisis arquitectónico indica que la estructura de capas propuesta, combinando un núcleo C++ de alto rendimiento con una interfaz Python de alta usabilidad, proporciona la abstracción necesaria para gestionar la complejidad del RVR. La aplicación del Patrón Adapter en la HAL permite abstraer los comandos binarios (DID/CID) del protocolo Sphero, mientras que el Patrón Observer gestiona el flujo de telemetría asíncrona. Este diseño permite que la lógica de aplicación pueda concentrarse en la funcionalidad robótica sin preocuparse por los detalles de la comunicación serial a 115200 baudios o la validación del checksum.
+
+
+\subsubsection{Capacidad de Abstracción por Capas}
+
+\textbf{Capa 1 - Protocolo:} Proporciona abstracción completa de los detalles binarios del protocolo Sphero, encapsulando la serialización y deserialización de comandos y la validación de checksums. Esta capa permite que las capas superiores trabajen con estructuras de datos de alto nivel sin conocimiento del formato binario específico.
+
+\textbf{Capa 2 - HAL (Hardware Abstraction Layer):} Implementa el Patrón Adapter para traducir comandos de alto nivel (como Twist de ROS) a comandos específicos del RVR, proporcionando una interfaz uniforme independiente del hardware subyacente.
+
+\textbf{Capa 3 - Interfaz Python:} Ofrece una API intuitiva y orientada a objetos que oculta completamente la complejidad de la comunicación serial y la gestión de concurrencia, permitiendo a los desarrolladores concentrarse en la lógica de aplicación robótica.
+
+
+\subsubsection{Beneficios de la Abstracción}
+
+La arquitectura propuesta logra una separación clara de responsabilidades que facilita el mantenimiento, la extensión y la prueba del sistema. La abstracción permite que múltiples desarrolladores trabajen en diferentes capas sin interferir entre sí, mientras que la interfaz Python simplifica la adopción del driver por parte de investigadores y estudiantes.
+
+
+\newpage
+
+
+\section{Recomendaciones Técnicas Integrales}
+\label{sec:recomendaciones_tecnicas}
+
+
+\subsection{Recomendaciones Arquitectónicas}
+
+
+\subsubsection{Arquitectura Híbrida Obligatoria}
+
+El desarrollo del driver ROS para el Sphero RVR se define por la necesidad de integrar robustamente dos paradigmas de concurrencia distintos: el asyncio del SDK de Sphero (optimizado para I/O serial) y la arquitectura multihilo síncrona de rospy. La implementación requiere una arquitectura de por lo menos tres capas, utilizando un hilo dedicado para el bucle de eventos de asyncio y un State Buffer seguro para hilos (Capa 2) para el intercambio de datos, entre el mundo ROS síncrono y el mundo RVR asíncrono.
+
+
+\subsubsection{Control Cinemático Preciso}
+
+Para aplicaciones de navegación avanzadas, el driver debe optar por el comando rawMotors del RVR en lugar de driveWithHeading, ya que esto permite la implementación explícita de la cinemática inversa diferencial, logrando un control predecible de las orugas a partir de comandos Twist estándar.
+
+
+\subsubsection{Robustez por Heartbeat}
+
+La fiabilidad del movimiento continuo y la seguridad lógica se basan en el Heartbeat Loop (un coroutine asíncrono periódico), que reenvía comandos de movimiento y actúa como el mecanismo de control de flujo para evitar la saturación de la UART, además de garantizar una parada pasiva en caso de fallo del host.
+
+
+\subsection{Recomendaciones de Implementación}
+
+
+\subsubsection{Verificación Eléctrica}
+
+Es imperativo verificar y garantizar que la comunicación serial con el RVR utilice estrictamente niveles lógicos de 3,3~V para evitar daños al hardware y asegurar la compatibilidad eléctrica.
+
+
+\subsubsection{Calibración de Frecuencia}
+
+La frecuencia del Sensor Streaming debe ser cuidadosamente calibrada (mejor por debajo de 30~Hz) para evitar el riesgo de flooding del puerto serial a 115200 baudios, que podría causar la pérdida de comandos de control.
+
+
+\subsubsection{Adopción de Estándares}
+
+Se recomienda la utilización de mensajes ROS estándar (Twist, Odometry, IMU) y la creación del paquete de mensajes personalizados \code{atriz\_rvr\_msgs} para encapsular las peculiaridades de la API nativa (escala 0-255).
+
+
+\subsection{Recomendaciones Estratégicas para la Escalabilidad}
+
+
+\subsubsection{Integración con ROS}
+
+Se recomienda que la salida de telemetría, una vez procesada por la lógica Observer, sea publicada como tópicos ROS estándar (p. ej. \code{sensor\_msgs/Imu}, \code{nav\_msgs/Odometry}). Esta práctica permite la integración inmediata con el ecosistema global de herramientas robóticas, facilitando el uso de algoritmos de navegación complejos, la visualización de datos y la simulación en plataformas como Gazebo \cite{KoenigHoward2004Gazebo} o CopeliaSIM \cite{RohmerSinghFreese2013VREP}.
+
+
+\subsubsection{Pruebas y Control de Calidad}
+
+Para asegurar la calidad del código desarrollado, se recomienda a futuro implementar pruebas unitarias básicas y seguir buenas prácticas de codificación. Las pruebas deben incluir validación de la comunicación serial y verificación de la conversión cinemática. Se sugiere mantener un código limpio y bien documentado para facilitar el mantenimiento y la colaboración en el proyecto.
+
+
+\subsection{Recomendaciones de Evolución Arquitectónica}
+
+
+\subsubsection{Evolución Arquitectónica Futura}
+
+La arquitectura híbrida actual representa un compromiso pragmático entre funcionalidad y simplicidad. Para futuras versiones, se recomienda evolucionar hacia una arquitectura completamente orientada a objetos que mejore la encapsulación y mantenibilidad, sin comprometer la estabilidad operacional lograda.
+
+
+\subsubsection{Optimización de Latencia}
+
+La implementación actual prioriza la funcionalidad y estabilidad sobre la optimización de latencia. Para aplicaciones que requieran tiempo real estricto, se recomienda implementar un bucle de eventos dedicado con delegación asíncrona para eliminar el bloqueo de hilos y mejorar la responsividad del sistema.
+
+
+\subsection{Evaluación del Driver Node (Atriz\_rvr\_node.py)}
+\label{sec:logros_tecnicos}
+
+
+\subsubsection{Arquitectura Interna y Flujo de Inicialización}
+
+El \code{Atriz\_rvr\_node.py} implementa una arquitectura híbrida que combina elementos funcionales y orientados a objetos, aprovechando las fortalezas de ambos paradigmas para resolver el desafío de integración entre el SDK asíncrono de Sphero y el middleware síncrono de ROS.
+
+\textbf{Estructura de Clases y Funciones:} El driver adopta un enfoque pragmático donde las funcionalidades principales (manejo de comandos, estado de batería, reseteo de odometría) se implementan como funciones de callback de ROS, manteniendo la simplicidad operacional mientras encapsula la lógica compleja del RVR en la clase SpheroRvrAsync del SDK oficial.
+
+\textbf{Compromiso Arquitectónico:} Esta arquitectura híbrida representa una decisión de diseño consciente que prioriza la funcionalidad y estabilidad operacional sobre la pureza arquitectónica. El uso de elementos funcionales simplifica la integración con el ecosistema ROS, mientras que la encapsulación de la lógica compleja en clases del SDK mantiene la modularidad necesaria.
+
+
+\subsubsection{Sistema de Comunicación Asíncrona}
+
+El driver implementa una solución para la integración de paradigmas de concurrencia, creando un puente efectivo entre el entorno asíncrono del SDK de Sphero y el entorno síncrono multihilo de rospy.
+
+\textbf{Gestión de Eventos:} El sistema aprovecha el bucle de eventos de asyncio para gestionar las operaciones del RVR y sus sensores, manteniendo la responsividad del sistema mientras procesa múltiples flujos de datos concurrentes.
+
+\textbf{Patrón de Sincronización:} El driver utiliza asyncio.run() dentro de los callbacks de ROS como una estrategia de sincronización que permite la integración directa de comandos asíncronos en el contexto síncrono de ROS. Esta aproximación, aunque introduce cierta latencia, proporciona una solución funcional y mantenible para el desafío de concurrencia híbrida.
+
+\textbf{Consideraciones de Rendimiento:} La implementación actual prioriza la funcionalidad y estabilidad sobre la optimización de latencia, lo cual es apropiado para aplicaciones educativas y de investigación donde la confiabilidad es más importante que el rendimiento en tiempo real estricto.
+
+
+\subsubsection{Sistema de Control Dual}
+
+El driver ofrece flexibilidad al implementar dos interfaces de control complementarias, adaptándose a diferentes niveles de experiencia del usuario y casos de uso específicos.
+
+\textbf{Comandos Estándar ROS (\code{cmd\_vel\_callback}):} La implementación de suscripción a \code{geometry\_msgs/Twist} demuestra la integración con los estándares de la industria robótica. La conversión precisa de rad/s a deg/s refleja un entendimiento profundo de los requisitos de interoperabilidad entre ROS y la API nativa de Sphero.
+
+\textbf{Comandos Intuitivos (\code{cmd\_degrees\_callback}):} El soporte para mensajes personalizados (DegreesTwist) proporciona una interfaz más apropiada para usuarios que trabajan directamente con la documentación de Sphero, eliminando la necesidad de conversiones manuales y reduciendo la posibilidad de errores de configuración.
+
+\textbf{Arquitectura de Delegación:} El diseño asume correctamente el uso de herramientas externas como \code{twist\_mux} para el arbitraje de comandos, manteniendo la responsabilidad del driver enfocada en la comunicación con el hardware mientras delega la lógica de priorización a componentes especializados.
+
+
+\subsubsection{Sistema de Seguridad y Gestión de Timeout}
+
+El sistema de seguridad implementa múltiples capas de protección que garantizan la operación segura del robot en diversos escenarios.
+
+\textbf{Parada de Emergencia:} La implementación de \code{emergency\_stop\_callback} proporciona una respuesta inmediata a condiciones de emergencia, combinando la detención del movimiento con feedback visual mediante LEDs, creando un sistema de seguridad comprehensivo y fácilmente observable.
+
+\textbf{Monitoreo de Timeout:} El uso de un timeout de 0,3 segundos, significativamente más agresivo que el valor por defecto del RVR (2 segundos), demuestra un enfoque proactivo hacia la seguridad operacional, asegurando que el robot responda rápidamente a la pérdida de comunicación.
+
+\textbf{Mecanismo de Heartbeat:} La implementación de un sistema de retransmisión periódica de comandos garantiza el movimiento continuo necesario para aplicaciones de navegación autónoma, mientras proporciona un mecanismo de failsafe pasivo que detiene el robot automáticamente en caso de fallo del sistema host.
+
+
+\subsubsection{Fortalezas del Driver Node}
+
+El \code{Atriz\_rvr\_node.py} representa una solución técnica sólida que aborda exitosamente los desafíos fundamentales de integración entre sistemas robóticos heterogéneos. La implementación destaca por su robustez operacional, implementando múltiples capas de seguridad que incluyen timeouts agresivos, paradas de emergencia inmediatas y mecanismos de failsafe pasivo. La precisión cinemática se logra mediante conversiones matemáticas exactas entre los sistemas de coordenadas de ROS y Sphero, garantizando un control predecible del movimiento. La cobertura funcional comprehensiva abarca todas las capacidades principales del RVR, incluyendo streaming de sensores, detección infrarroja y control de LEDs. La flexibilidad del sistema se manifiesta en el soporte dual para interfaces estándar e intuitivas, adaptándose a diferentes niveles de experiencia del usuario y facilitando la integración con herramientas existentes de ROS.
+
+
+\newpage
+
+
+\section{Implementación Técnica Avanzada}
+\label{sec:implementacion_tecnica}
+
+
+\subsection{Implementación de la Arquitectura de Capas}
+
+Como se detalló en la Sección \ref{sec:arquitectura_capas}, la arquitectura de tres capas del driver requiere implementaciones técnicas específicas para cada componente. Esta sección profundiza en los aspectos técnicos de la implementación.
+
+
+\subsection{Encapsulamiento y Modularidad en C++}
+
+Para el desarrollo en C++, se recomienda mantener un código bien estructurado y modular. Las clases públicas del driver deben exponer solo las interfaces necesarias, ocultando los detalles de implementación interna. Esto facilita el mantenimiento del código y reduce el acoplamiento entre componentes.
+
+\textbf{Separación de Interfaz e Implementación:} Se recomienda separar claramente la interfaz pública de la implementación interna, manteniendo los detalles complejos en archivos de implementación (.cpp) y exponiendo solo las funciones necesarias en los archivos de cabecera (.h).
+
+
+\subsection{Patrones de Diseño e Implementación Técnica}
+
+
+\subsubsection{Detalle del Protocolo Sphero API y Validación}
+
+El Sphero RVR utiliza un protocolo de comunicación basado en paquetes con una estructura única que permite el intercambio de comandos y datos entre el robot y el sistema host. Para entender cómo funciona este protocolo, es necesario explicar cada componente de manera detallada.
+
+\paragraph{Estructura Básica de Paquetes}
+Cada paquete de comunicación sigue una estructura específica que garantiza la transmisión confiable de datos:
+
+\begin{itemize}
+    \item \textbf{SOP (Start of Packet):} Byte especial que marca el inicio de cada paquete. Es como un ``saludo'' que le dice al receptor ``aquí empieza un nuevo mensaje''.
+    \item \textbf{EOP (End of Packet):} Byte especial que marca el final de cada paquete. Es como un ``adiós'' que confirma que el mensaje terminó.
+    \item \textbf{DID (Device ID):} Identificador de dos bytes que especifica qué dispositivo del RVR debe procesar el comando (p. ej. motores, sensores, LEDs).
+    \item \textbf{CID (Command ID):} Identificador de dos bytes que especifica qué acción debe realizar el dispositivo (p. ej. mover, leer sensor, cambiar color).
+    \item \textbf{Payload:} Los datos específicos del comando (p. ej. velocidad, color, configuración).
+    \item \textbf{Checksum:} Byte de verificación que garantiza que el paquete llegó completo y sin errores.
+\end{itemize}
+
+\paragraph{Ejemplo Práctico de un Paquete}
+Para enviar un comando de movimiento al RVR, el paquete podría verse así:
+\begin{verbatim}
+SOP | DID | CID | Payload (velocidad) | Checksum | EOP
+0xAA | 0x02 | 0x30 | 0x80 0x00 | 0x45 | 0x55
+\end{verbatim}
+
+Donde:
+\begin{itemize}
+    \item \textbf{DID 0x02:} Se refiere al subsistema de motores.
+    \item \textbf{CID 0x30:} Comando específico para movimiento con velocidad.
+    \item \textbf{Payload 0x80 0x00:} Velocidad específica (128 en escala 0-255).
+    \item \textbf{Checksum 0x45:} Verificación calculada sobre todos los bytes.
+\end{itemize}
+
+\paragraph{Manejo de Datos Multi-byte y Endianness}
+Un aspecto fundamental para la implementación del driver es el manejo de datos de múltiples bytes. La Sphero API especifica que todas las palabras de múltiples bytes (como valores de sensores o parámetros de velocidad) deben estar en formato Big-Endian.
+
+\textbf{¿Qué es Endianness?} Es la forma en que las computadoras almacenan números de múltiples bytes en memoria:
+\begin{itemize}
+    \item \textbf{Big-Endian:} El byte más significativo se almacena primero (p. ej. 0x1234 se almacena como 0x12 0x34).
+    \item \textbf{Little-Endian:} El byte menos significativo se almacena primero (p. ej. 0x1234 se almacena como 0x34 0x12).
+\end{itemize}
+
+\textbf{¿Por qué es importante?} Los SBC modernos (como Raspberry Pi) usan Little-Endian, pero el protocolo Sphero requiere Big-Endian. El parser en la Capa 1 debe convertir automáticamente entre estos formatos para que los datos se interpreten correctamente.
+
+\paragraph{Sistema de Validación y Checksum}
+La integridad de los paquetes se garantiza mediante un checksum de un solo byte, calculado sobre todos los bytes del paquete, excluyendo SOP y EOP.
+
+\textbf{¿Cómo funciona el Checksum?}
+\begin{enumerate}
+    \item Se suman todos los bytes del paquete (excepto SOP y EOP).
+    \item Se toma solo el byte menos significativo del resultado.
+    \item Este valor se compara con el checksum recibido.
+    \item Si coinciden, el paquete es válido; si no, se descarta.
+\end{enumerate}
+
+\textbf{Ejemplo de Cálculo:}
+Para el paquete del ejemplo anterior:
+\begin{verbatim}
+DID (0x02) + CID (0x30) + Payload (0x80 + 0x00) =
+  0x02 + 0x30 + 0x80 + 0x00 = 0xB2
+Checksum calculado = 0xB2 (solo el byte menos significativo)
+Checksum recibido = 0x45
+\end{verbatim}
+Si no coinciden, el paquete se considera corrupto y se descarta.
+
+\paragraph{Máquina de Estados para Procesamiento}
+La Capa 1 debe implementar una máquina de estados determinista para el procesamiento de paquetes. Esta máquina funciona de la siguiente manera:
+
+\begin{enumerate}
+    \item \textbf{Estado de Espera:} Busca el byte SOP para identificar el inicio de un paquete.
+    \item \textbf{Estado de Recepción:} Recopila todos los bytes del paquete hasta encontrar EOP.
+    \item \textbf{Estado de Validación:} Calcula el checksum y verifica la integridad.
+    \item \textbf{Estado de Procesamiento:} Si el paquete es válido, lo pasa a la capa de abstracción.
+    \item \textbf{Estado de Error:} Si hay problemas, descarta el paquete y vuelve al estado de espera.
+\end{enumerate}
+
+Este proceso garantiza que solo los paquetes válidos y completos lleguen a las capas superiores del driver, manteniendo la integridad y confiabilidad de la comunicación con el RVR.
+
+
+\subsubsection{Gestión de Datos de Sensores en Tiempo Real}
+
+El robot RVR es una fuente continua de datos de sensores, reportando constantemente información sobre su estado (IMU, color, infrarrojos) y eventos como colisiones. Este flujo de datos es continuo e impredecible, lo que requiere un manejo especial en el driver.
+
+\paragraph{¿Por qué es importante manejar estos datos correctamente?}
+Si el driver tuviera que preguntar constantemente al RVR ``¿tienes nuevos datos?'' (lo que se llama polling), esto sería ineficiente porque:
+\begin{itemize}
+    \item Introduciría latencia innecesaria en el sistema.
+    \item Consumiría recursos de CPU de manera constante.
+    \item Podría perder datos si el robot envía información mientras el sistema está ocupado.
+\end{itemize}
+
+\paragraph{¿Cómo maneja el driver estos datos?}
+El driver implementa un sistema donde:
+\begin{itemize}
+    \item El RVR envía datos automáticamente cuando están disponibles.
+    \item El driver los recibe y procesa inmediatamente.
+    \item Los datos se almacenan en un buffer para que otros componentes puedan acceder a ellos.
+    \item Cada tipo de sensor tiene su propio canal de datos.
+\end{itemize}
+
+\paragraph{Ejemplo práctico}
+Cuando el RVR detecta una colisión:
+\begin{enumerate}
+    \item El sensor de colisión envía inmediatamente un paquete de datos.
+    \item El driver recibe este paquete y lo procesa.
+    \item El sistema de control puede reaccionar inmediatamente (p. ej. detener el robot).
+    \item Los datos se almacenan para análisis posterior.
+\end{enumerate}
+
+Este enfoque garantiza que el driver responda rápidamente a los cambios en el estado del robot, manteniendo un sistema eficiente y confiable para la comunicación con el RVR.
+
+
+\newpage
+
+
+\section{Implementación de Patrones de Diseño}
+\label{sec:patrones_diseno}
+
+
+\subsection{Organización del Código en el Driver}
+
+El driver está organizado siguiendo principios de buena programación que facilitan su mantenimiento y comprensión. Esta sección explica cómo está estructurado el código y por qué se organizó de esta manera.
+
+
+\subsubsection{Principios de Organización Aplicados}
+
+\textbf{Encapsulamiento:} El código está organizado de manera que cada componente tiene responsabilidades claras y bien definidas. Por ejemplo, la comunicación con el RVR está separada de la lógica de control, lo que hace que el código sea más fácil de entender y modificar.
+
+\textbf{Gestión de Datos de Sensores:} En lugar de que el sistema pregunte constantemente al RVR si tiene nuevos datos (lo que sería ineficiente), el RVR envía automáticamente los datos cuando están disponibles. El driver los recibe y los procesa inmediatamente, almacenándolos para que otros componentes puedan usarlos.
+
+\textbf{Adaptación de Interfaces:} El driver actúa como un traductor entre dos sistemas diferentes; por un lado, ROS que usa comandos simples como ``mover hacia adelante'', y el protocolo del RVR, que requiere comandos complejos con códigos específicos. El driver convierte automáticamente entre estos dos formatos (ver Tabla \ref{tab:organizacion_driver}).
+
+\begin{table}[htbp]
+\centering
+\caption{Principios de Organización del Driver}
+\label{tab:organizacion_driver}
+\begin{tabular}{|p{0.16\textwidth}|p{0.24\textwidth}|p{0.24\textwidth}|p{0.24\textwidth}|}
+\hline
+\textbf{Principio} & \textbf{¿Qué hace en el Driver?} & \textbf{¿Por qué es importante?} & \textbf{¿Qué pasaría sin esto?} \\
+\hline
+Encapsulamiento & Cada componente tiene una función específica bien definida & Facilita el mantenimiento y la comprensión del código & El código sería confuso y difícil de modificar \\
+\hline
+Recepción Automática & El RVR envía datos automáticamente cuando están disponibles & Evita pérdida de datos reduciendo el uso de CPU & El sistema podría perder información importante y ser ineficiente \\
+\hline
+Traducción de Comandos & Convierte comandos simples de ROS a comandos complejos del RVR & Permite usar comandos fáciles de entender & Tendríamos que aprender comandos técnicos complejos \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\newpage
+
+
+\section{Calidad del Código y Prácticas de Desarrollo}
+
+
+\subsection{Gestión de Memoria y Recursos}
+
+Para el componente C++ del driver, se recomienda seguir buenas prácticas básicas de gestión de memoria:
+
+\textbf{Gestión Segura:} Evitar el uso directo de \texttt{new} y \texttt{delete}, utilizando contenedores estándar cuando sea posible. Asegurar que todos los recursos asignados sean liberados correctamente, especialmente en contextos de comunicación serial asíncrona.
+
+\textbf{Manejo de Errores:} Implementar manejo apropiado de fallos de bajo nivel (error de I/O, fallo de checksum), garantizando la liberación de recursos antes de reportar fallas.
+
+
+\subsection{Métricas de Calidad Básicas}
+
+Para mantener la calidad del código en el proyecto universitario, se recomienda monitorear las métricas simples que se muestran en la Tabla \ref{tab:metricas_calidad}.
+
+\begin{table}[htbp]
+\centering
+\caption{Métricas de Calidad del Driver RVR}
+\label{tab:metricas_calidad}
+\begin{tabular}{|p{0.20\textwidth}|p{0.24\textwidth}|p{0.46\textwidth}|}
+\hline
+\textbf{Métrica} & \textbf{Umbral Recomendado} & \textbf{Justificación} \\
+\hline
+Complejidad Ciclomática & CC $<$ 10 por función & Facilita la comprensión y testing del código \\
+\hline
+Líneas por Función & $<$ 50 líneas & Mejora la legibilidad y mantenibilidad \\
+\hline
+Densidad de Comentarios & $>$ 20\% en código crítico & Facilita la comprensión para nuevos desarrolladores \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Estrategias de Pruebas Implementadas}
+
+El driver incluye una suite completa de pruebas organizadas en tres categorías principales:
+
+\textbf{Pruebas Automatizadas:} El repositorio incluye scripts de prueba automatizada (\code{testing\_scripts/automated/}) que validan el funcionamiento del driver sin intervención manual. Estas pruebas incluyen:
+\begin{itemize}
+    \item Validación del driver principal (\code{test\_atriz\_rvr\_driver.py})
+    \item Pruebas completas del sistema (\code{run\_complete\_tests.py})
+    \item Ejecución mediante script de lanzamiento (\code{./run\_tests.sh automated})
+\end{itemize}
+
+\textbf{Pruebas Interactivas:} Para validación manual y debugging, se implementan pruebas interactivas (\code{testing\_scripts/interactive/}) que permiten probar funcionalidades individuales:
+\begin{itemize}
+    \item Pruebas de funciones individuales (\code{test\_individual\_functions.py})
+    \item Ejecución mediante script de lanzamiento (\code{./run\_tests.sh interactive})
+\end{itemize}
+
+\textbf{Diagnóstico del Sistema:} Para mantenimiento y solución de problemas, se incluyen herramientas de diagnóstico (\code{testing\_scripts/diagnostic/}):
+\begin{itemize}
+    \item Diagnóstico completo del sistema (\code{diagnose\_system.py})
+    \item Ejecución mediante script de lanzamiento (\code{./run\_tests.sh diagnostic})
+\end{itemize}
+
+\textbf{Comunicación Serial:} Utilizar objetos mock para simular el comportamiento del puerto UART, permitiendo probar escenarios de fallo sin hardware real.
+
+\textbf{Escenarios Críticos:} Probar el manejo de paquetes con checksum inválido, buffers llenos, y condiciones de concurrencia entre asyncio y rospy.
+
+\textbf{Conversión Cinemática:} Validar la precisión de la conversión de unidades ROS (m/s, rad/s) a escala RVR (0-255) bajo diferentes condiciones de entrada.
+
+
+\subsection{Estándares de Codificación}
+
+Se recomienda seguir prácticas básicas de desarrollo:
+
+\textbf{Python:} Utilizar nombres descriptivos, mantener indentación consistente y comentar secciones complejas del código.
+
+\textbf{C++:} Separar claramente la interfaz pública de la implementación interna, manteniendo los detalles complejos en archivos .cpp.
+
+\textbf{Documentación:} Documentar funciones principales con docstrings (Python) y comentarios descriptivos (C++), explicando el propósito y parámetros de cada componente.
+
+
+\subsection{Estructura del Repositorio Implementada}
+
+El driver está organizado en un repositorio Git con la siguiente estructura modular:
+
+\textbf{Paquetes Principales:}
+\begin{itemize}
+    \item \code{atriz\_rvr\_driver/} - Driver principal ROS con el nodo \code{Atriz\_rvr\_node.py}.
+    \item \code{atriz\_rvr\_msgs/} - Mensajes personalizados (DegreesTwist, ColorDetection, etc.).
+    \item \code{atriz\_rvr\_serial/} - Componente de comunicación serial.
+\end{itemize}
+
+\textbf{Directorios de Soporte:}
+\begin{itemize}
+    \item \code{docs/} - Documentación técnica y guías de usuario.
+    \item \code{launch/} - Archivos de lanzamiento ROS (.launch).
+    \item \code{scripts/} - Scripts de utilidad y configuración.
+    \item \code{testing\_scripts/} - Suite completa de pruebas (automatizadas, interactivas, diagnóstico).
+\end{itemize}
+
+\textbf{Configuración y Herramientas:}
+\begin{itemize}
+    \item Configuración de linters (Pyright, Pylint, VS Code).
+    \item Scripts de configuración automática (\code{setup\_python\_path.py}).
+    \item Scripts de lanzamiento de pruebas (\code{run\_tests.sh}).
+\end{itemize}
+
+
+\subsection{Gestión del Proyecto}
+
+Para facilitar la colaboración académica:
+
+\textbf{Repositorio Git:} El código está alojado en un repositorio centralizado con control de versiones, incluyendo un README.md detallado con instrucciones de instalación y ejemplos de uso.
+
+\textbf{Documentación de Usuario:} La documentación incluye guías paso a paso para configuración, ejemplos prácticos de comandos, y solución de problemas comunes.
+
+
+\newpage
+
+
+\section{Evaluación Integral y Recomendaciones Estratégicas}
+
+
+\subsection{Síntesis Ejecutiva}
+
+Este análisis técnico del desarrollo del driver ROS para el Sphero RVR ha revelado la complejidad inherente de integrar sistemas robóticos modernos con middleware de software. El driver desarrollado representa una solución funcional que aborda los desafíos de concurrencia, comunicación serial y abstracción de hardware.
+
+
+\subsection{Logros Técnicos Principales}
+
+Los logros técnicos principales incluyen la integración asíncrona mediante la implementación de un puente entre el SDK asyncio de Sphero y el middleware ROS síncrono, el control cinemático logrado a través de conversión de comandos Twist estándar a la escala nativa del RVR, el sistema de seguridad con implementación de mecanismos de parada de emergencia y failsafe pasivo, y la arquitectura escalable con diseño modular que facilita la extensión y mantenimiento.
+
+
+\subsection{Impacto en la Investigación Robótica}
+
+El driver desarrollado proporciona una base sólida para la investigación y desarrollo en robótica móvil. Su diseño modular y la adherencia a estándares de la industria permite la integración con herramientas existentes de ROS, facilitando el desarrollo de algoritmos de navegación autónoma y aplicaciones de investigación avanzadas.
+
+
+\subsection{Próximos Pasos Recomendados}
+
+\begin{enumerate}
+    \item \textbf{Refactorización del Núcleo}: Implementar un bucle de eventos dedicado para mejorar la latencia.
+    \item \textbf{Migración a ROS 2}: Evaluar la migración futura para aprovechar mejor integración con asyncio.
+    \item \textbf{Expansión de Funcionalidades}: Integración de sensores adicionales y algoritmos de navegación.
+    \item \textbf{Documentación Técnica}: Desarrollo de tutoriales y guías de usuario para la comunidad académica.
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Recomendación Final:} El driver representa un logro técnico significativo que demuestra la capacidad de la Universidad de Nariño para desarrollar software robótico de nivel industrial. Se recomienda continuar con el desarrollo iterativo y la integración con proyectos de investigación más amplios.
+\end{infobox}
+
+\vspace{1cm}
+\begin{center}
+\textbf{\color{darkblue}¡Gracias por elegir el Driver Atriz para su desarrollo robótico!}
+
+\textbf{\color{darkblue}¡Transformando la robótica educativa en la Universidad de Nariño!}
+\end{center}
+
+
+\newpage
+
+
+\section{Bibliografía}
+
+
+\printbibliography
+
+
+
+\end{document}

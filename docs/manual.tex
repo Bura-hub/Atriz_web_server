@@ -1,0 +1,732 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip} % Elimina sangría y agrega espacio entre párrafos
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{xurl}
+% Figuras en la posición exacta del texto (no flotantes)
+\floatplacement{figure}{H}
+\usepackage{tcolorbox}
+% Inserción de figuras: si el archivo no existe, se muestra un placeholder (documento compila igual)
+\newcommand{\insertfig}[2][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{\fbox{\parbox{0.85\linewidth}{\centering\vspace{2cm}\small [Falta la imagen: \path{#2}]\vspace{2cm}}}}%
+}
+\usepackage{setspace}
+
+
+% --- Profundidad de numeración y tabla de contenidos ---
+\setcounter{secnumdepth}{5}  % Numera hasta subparagraph (5 niveles)
+\setcounter{tocdepth}{3}     % Muestra en índices hasta subsubsection (3 niveles)
+
+% --- Redefinir "Cuadro" como "Tabla" para babel español ---
+\addto\captionsspanish{%
+  \def\tablename{Tabla}%
+}
+\AtBeginDocument{%
+  \renewcommand{\tablename}{Tabla}%
+}
+
+% --- Numeración jerárquica de figuras y tablas por sección ---
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+% --- Colores personalizados ---
+\definecolor{darkblue}{rgb}{0.1, 0.2, 0.4}
+\definecolor{sectioncolor}{rgb}{0.15, 0.35, 0.65}
+\definecolor{codegray}{rgb}{0.96, 0.96, 0.96}
+\definecolor{codeblue}{rgb}{0.25, 0.41, 0.88}
+\definecolor{codegreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{warningcolor}{rgb}{0.8, 0.4, 0.0}
+\definecolor{successcolor}{rgb}{0.0, 0.6, 0.0}
+\definecolor{infocolor}{rgb}{0.0, 0.4, 0.8}
+
+% --- Encabezado y pie de página ---
+\pagestyle{fancy}
+\fancyhead[L]{\textbf{Manual de Usuario}}
+\fancyhead[R]{\textbf{SW-LRE-UDENAR}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Estilo de página para inicio de capítulo (sin encabezado)
+\fancypagestyle{chapterpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+}
+
+% Estilo de página para índices (sin encabezado ni líneas)
+\fancypagestyle{indexpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% --- Hipervínculos (índice y referencias en negro; evita comandos en bookmarks) ---
+\pdfstringdefDisableCommands{%
+  \def\code#1{#1}%
+  \def\file#1{#1}%
+}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=black,
+    pdftitle={Manual de Usuario - SW-LRE-UDENAR},
+    pdfauthor={Brayan Stiven López Méndez},
+    hypertexnames=false
+}
+
+% --- Estilo de títulos (negro bold) ---
+\titleformat{\section}[display]
+  {\normalfont\Large\bfseries\color{black}}
+  {\vspace*{1cm}\huge Capítulo \thesection}
+  {10pt}
+  {\Huge\bfseries\color{black}}
+  [\thispagestyle{chapterpage}]
+\titlespacing*{\section}
+  {0pt}{0pt}{40pt}
+
+\titleformat{\subsection}
+  {\Large\bfseries\color{black}}{\thesubsection}{1em}{}[\justifying]
+\titlespacing*{\subsection}
+  {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{black}}{\thesubsubsection}{1em}{}[\justifying]
+\titlespacing*{\subsubsection}
+  {0pt}{3ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\titleformat{\paragraph}
+  {\normalsize\bfseries\color{black}}{\theparagraph}{1em}{}[\justifying]
+\titlespacing*{\paragraph}
+  {0pt}{2.5ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+\titleformat{\subparagraph}
+  {\normalsize\itshape\color{black}}{\thesubparagraph}{1em}{}[\justifying]
+\titlespacing*{\subparagraph}
+  {0pt}{2ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+% --- Configuración del listado de código ---
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codegreen},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  language=Python,
+  inputencoding=utf8,
+  extendedchars=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+% --- Espaciado entre líneas ---
+\onehalfspacing
+%\doublespacing
+\setlength{\headheight}{16pt}
+
+% --- Comandos personalizados ---
+\newcommand{\warning}[1]{\textcolor{warningcolor}{\textbf{ADVERTENCIA:} #1}}
+\newcommand{\tip}[1]{\textcolor{successcolor}{\textbf{CONSEJO:} #1}}
+\newcommand{\info}[1]{\textcolor{infocolor}{\textbf{INFORMACIÓN:} #1}}
+% Código y nombres de archivo: estilo técnico (monoespaciado + color)
+%\newcommand{\code}[1]{\textcolor{codeblue}{\texttt{\small#1}}}
+\newcommand{\code}[1]{\textcolor{codeblue}{\url{#1}}}
+\newcommand{\file}[1]{\textcolor{darkblue}{\texttt{#1}}}
+
+% --- Cajas de información ---
+\newtcolorbox{infobox}{
+    colback=infocolor!10,
+    colframe=infocolor,
+    coltitle=infocolor,
+    title=\textbf{Información Técnica},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{warningbox}{
+    colback=warningcolor!10,
+    colframe=warningcolor,
+    coltitle=warningcolor,
+    title=\textbf{Consideración Importante},
+    fonttitle=\bfseries
+}
+
+\newtcolorbox{tipbox}{
+    colback=successcolor!10,
+    colframe=successcolor,
+    coltitle=successcolor,
+    title=\textbf{Nota Técnica},
+    fonttitle=\bfseries
+}
+
+\begin{document}
+\sloppy
+%\setstretch{0.95}
+\justifying
+
+% --- PORTADA PERSONALIZADA ---
+\thispagestyle{empty}
+\begin{titlepage}
+    \centering
+    \vspace*{0.1cm}
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+    {\Large\textbf{MANUAL DE USUARIO}}\\[0.5cm]
+    {\Large\textbf{Software del Laboratorio de Robótica de Enjambres}}\\[0.5cm]
+    {\Large\textbf{de la Universidad de Nariño}}\\[0.5cm]
+    {\huge\textbf{SW-LRE-Udenar}}\\[0.5cm]
+    \insertfig[width=0.5\textwidth]{images/Logos.png}\\[0.5cm]
+    \vfill
+    %{\normalsize Autores:}\\[0.2cm]
+    \large{\textbf{Brayan Stiven López-Méndez}}\\
+    \url{bsmendez24B@udenar.edu.co}\\
+    Ing. Electrónico - Estudiante Maestría en Ingeniería Electrónica\\
+    Universidad de Nariño\\
+    \vfill
+    \large{\textbf{Wilson Olmedo Achicanoy-Martínez, PhD.}}\\
+    \url{wilachic@udenar.edu.co}\\
+    Docente Tiempo Completo - Departamento de Electrónica\\
+    Universidad de Nariño
+    {\color{black}\rule{\textwidth}{2pt}\par}
+    \vspace{0.5cm}
+\end{titlepage}
+
+% --- ÍNDICES ---
+\newpage
+\renewcommand{\contentsname}{\Huge\textbf{Índice general}\vspace{-0.1cm}}
+\renewcommand{\listfigurename}{\Huge\textbf{Índice de Figuras}\vspace{-0.1cm}}
+\renewcommand{\listtablename}{\Huge\textbf{Índice de Tablas}\vspace{-0.1cm}}
+
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\tableofcontents
+\newpage
+
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\listoffigures
+\newpage
+
+\thispagestyle{indexpage}
+\vspace*{1cm}
+\listoftables
+\newpage
+
+\thispagestyle{fancy}
+\mbox{}
+\newpage
+
+\newcommand{\sectionbreak}{\clearpage}
+
+
+% =======================
+\section{Agradecimientos}
+\justifying
+
+Los autores agradecen a la Universidad de Nariño y en especial a la Vicerrectoría de Investigaciones e Interacción Social (VIIS), por el apoyo económico y administrativo brindado para el desarrollo del Laboratorio de Robótica de Enjambres (LRE-UDENAR), en el contexto de la ejecución del proyecto N.\textsuperscript{o} 2703 ``Desarrollo de un laboratorio remoto y abierto en la línea de robótica de enjambres para la Universidad de Nariño'' de la Convocatoria Docente 2022.
+
+De igual manera, agradecen todo el apoyo académico y dedicación de los investigadores externos y de los investigadores de los programas de Ingeniería Electrónica y Maestría en Ingeniería Electrónica del Departamento de Electrónica y que pertenecen al Grupo de Investigación en Ingeniería Eléctrica y Electrónica (GIIEE) de la Universidad de Nariño.
+
+
+% =======================
+\section{Introducción}
+\justifying
+
+El software que permite el acceso al Laboratorio de Robótica de Enjambres de la Universidad de Nariño es un desarrollo de ingeniería que abstrae la complejidad del control de bajo nivel de robots móviles y del \textit{middleware} ROS (\textit{Robot Operating System}) por medio de una interfaz web unificada. En robótica de enjambre, la gestión simultánea de múltiples agentes exige el dominio de terminal Linux, el protocolo SSH (Secure Shell) y la arquitectura de ROS antes de ejecutar un experimento. De esta manera, SW-LRE-UDENAR permite a un usuario del laboratorio cargar código, ejecutar rutinas y visualizar datos de telemetría desde un navegador estándar.
+
+En esta solución software propuesta se deben tener en cuenta las capacidades de una interfaz web, las limitaciones físicas de la red y el procesamiento en el borde. Por lo tanto, en este manual se evitará afirmar condiciones ideales de funcionamiento en tiempo real absoluto o plug-and-play universal; en cambio, se indicará que el sistema cumple con los requisitos de diseño del laboratorio. En su lugar, este presenta de forma rigurosa la arquitectura del sistema, las limitaciones del \textit{streaming} en formato MJPEG (\textit{Motion JPEG}) sobre HTTP (\textit{Hypertext Transfer Protocol}), los cuellos de botella en la ejecución de \textit{scripts} vía SSH y las dependencias del hardware que contiene el laboratorio (robot tipo Sphero RVR y computador de una sola tarjeta Raspberry Pi). El software no es solo un panel de control; por el contrario, es un orquestador de \textit{middleware} que integra un \textit{Frontend} en Vue.js~3, un \textit{Backend} en FastAPI (Python) y una capa de abstracción de hardware gestionada por ROS Noetic.
+
+
+\subsection{Propósito del documento}
+
+Este manual de usuario brinda información para la operación y el uso adecuados del Laboratorio de Robótica de Enjambres. Su estructura sigue la convención de un manual de usuario: introducción, acceso a la plataforma, uso (qué pantallas y funciones encontrará el usuario), descripción general de la arquitectura y limitaciones, validación realizada y resolución de problemas. Complementa la documentación de instalación y despliegue y no la sustituye.
+
+
+\subsection{Alcance}
+
+El alcance de la solución abarca desde la capa de aplicación (interfaz Vue.js y API REST) hasta la integración con la capa de transporte y red (SSH, protocolos ROS) y la capa física (Raspberry Pi y Sphero RVR).
+
+\begin{tipbox}
+\textbf{Documentación complementaria:}\\
+Para los detalles del driver ROS que ejecuta el robot (Sphero RVR) en la Raspberry Pi, la comunicación UART, el mapeo de tópicos (\code{/cmd\_vel}, odometría, sensores) y la arquitectura del nodo, véase el documento técnico DRIVER ROS PARA SPHERO incluido en la documentación del software. Este manual se centra solo en la operación del laboratorio considerando que los robots están ya configurados para ser usados en este entorno.
+\end{tipbox}
+
+Los componentes cubiertos son:
+
+\begin{itemize}
+    \item \textbf{\textit{Frontend}:} Interfaz Vue.js~3 (SPA) con gestión de experimentos, envío de \textit{scripts} a los robots, visualización de vídeo MJPEG y lectura de datos de sensores.
+    \item \textbf{\textit{Backend}:} API REST con FastAPI, gestión de usuarios, experimentos y robots, y módulo de integración (\file{ros\_bridge.py}) que transfiere y ejecuta \textit{scripts} en los robots vía \code{scp} y \code{ssh} (\code{rosrun sphero\_rvr\_pkg script\_executor.py}).
+    \item \textbf{Integración con ROS:} Nodos \code{usb\_cam}, \code{web\_video\_server}, ejecutor de \textit{scripts}, transmisión de vídeo y comandos.
+    \item \textbf{Seguridad y autenticación:} \textit{login} OAuth2 con JWT, protección de rutas en el \textit{Frontend} y validación de \textit{token} en la API.
+\end{itemize}
+
+
+\subsection{Público objetivo y prerrequisitos}
+El documento está redactado para un perfil técnico avanzado: ingenieros electrónicos, mecatrónicos y de software, roboticistas y en general administradores de sistemas informáticos. Se asume familiaridad con entornos Linux (gestión de paquetes, servicios), conceptos de desarrollo web (ciclo de petición HTTP, modelo cliente-servidor) y nociones básicas de robótica (odometría, sensores). Para el despliegue del servidor se requieren además conocimientos de PostgreSQL, Nginx y variables de entorno.
+
+
+% =======================
+\section{Acceso al laboratorio}
+\justifying
+
+Para utilizar el laboratorio, el usuario debe acceder desde un navegador a la URL donde está desplegado el \textit{Frontend} (dirección proporcionada por el administrador local). No se requiere instalación en el equipo del usuario y basta con tener un navegador moderno con Java\textit{script} habilitado.
+
+Al abrir la URL se muestra la pantalla de inicio de sesión (véase el Capítulo~\ref{sec:uso}, Figura~\ref{fig:login}). El usuario debe introducir su nombre de usuario (\emph{username}) y contraseña. Las credenciales se envían al servidor; si son correctas, el \textit{Backend} devuelve un \textit{token} JWT y el \textit{Frontend} redirige al panel principal (\textit{dashboard}). Si las credenciales son incorrectas, se muestra un mensaje de error y el usuario puede reintentar. Una vez dentro del laboratorio, las rutas del panel (control de experimentos, vídeo, envío de \textit{scripts}, sensores) quedan disponibles; el \textit{token} se utiliza de forma transparente en cada petición a la API. Para cerrar sesión, el usuario debe utilizar la opción correspondiente en la interfaz, tras lo cual será redirigido de nuevo a la pantalla de \textit{login}.
+
+\begin{tipbox}
+\textbf{Primera vez:}\\
+Si no dispone de credenciales, debe solicitarlas al administrador de la plataforma. El alta de usuarios se realiza desde la API (documentación en \code{/admin/docs}) o mediante los procedimientos internos del laboratorio.
+\end{tipbox}
+
+En la Figura~\ref{fig:flujo_acceso} se resume el flujo de acceso: URL $\rightarrow$ pantalla de \textit{login} $\rightarrow$ \textit{dashboard}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.8\linewidth]{images/fig_flujo_acceso.png}
+    \caption{Flujo de acceso a la plataforma: URL, \textit{login} y panel principal. Fuente: elaboración propia.}
+    \label{fig:flujo_acceso}
+\end{figure}
+
+
+% =======================
+\section{Uso del laboratorio}
+\label{sec:uso}
+\justifying
+
+Esta sección describe las pantallas y funcionalidades que el usuario encontrará al operar el software del laboratorio. Las figuras de este capítulo (Figuras~\ref{fig:func_con_ex}--\ref{fig:responsi}) sirven como guía visual de lo que debe esperar al usar el sistema.
+
+
+\subsection{Control de experimentos y vídeo}
+
+A continuación, encontrará la información más importante para acceder a las funciones principales del laboratorio.
+
+
+\subsubsection{Control de experimentos}
+
+En la Figura~\ref{fig:func_con_ex} se muestran los controles de la interfaz para iniciar, detener y reiniciar experimentos, así como el apartado de resultados donde se muestra la respuesta de uno de los prototipos al interactuar con dichos controles.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/Control_experimentos.png}
+    \caption{Interfaz de control de experimentos. Fuente: elaboración propia.}
+    \label{fig:func_con_ex}
+\end{figure}
+
+
+\subsubsection{Transmisión de vídeo}
+
+En la Figura~\ref{fig:Video_transmision} se muestra la interfaz con el \textit{stream} de vídeo. La latencia observada depende del ancho de banda y de la configuración del servidor de vídeo. En condiciones normales de red, se espera que el vídeo se visualice de forma estable.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/image.png}
+    \caption{Transmisión de vídeo a través de la plataforma de acceso remoto. Fuente: elaboración propia.}
+    \label{fig:Video_transmision}
+\end{figure}
+
+
+\subsection{API y envío a robots}
+
+\subsubsection{Operaciones sobre usuarios (API)}
+
+A continuación se describen las operaciones CRUD sobre usuarios que expone la API, con apoyo en las figuras. La documentación interactiva la puede encontrar en \code{/admin/docs}.
+
+En la Figura~\ref{fig:verif} se muestra una consulta a la base de datos \code{swarm\_lab}, en la tabla \code{Users}, donde se listan los usuarios registrados.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/API_usernew.png}
+    \caption{Verificación de usuarios en PostgreSQL (tabla \code{Users}). Fuente: elaboración propia.}
+    \label{fig:verif}
+\end{figure}
+
+A partir de este listado se verificó el estado de la base de datos antes y después de cada operación de la API. La sección de \textit{Users} en la documentación de FastAPI (\code{/admin/docs}) expone los \textit{endpoints} de creación, lectura, actualización y eliminación de usuarios.
+
+\paragraph{Creación de usuario.}
+En la Figura~\ref{fig:creac} se muestra la estructura del método \code{POST} para la creación de usuario, con los campos \code{username}, \code{full\_name} y \code{password}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/API_usernew_01.png}
+    \caption{Creación de usuario nuevo. Fuente: elaboración propia.}
+    \label{fig:creac}
+\end{figure}
+
+En la Figura~\ref{fig:creacion} se muestra la respuesta de la API tras la creación y la verificación en PostgreSQL del nuevo registro en la tabla \code{Users}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/API_usernew_02.png}
+    \caption{Respuesta de la API y verificación en PostgreSQL. Fuente: elaboración propia.}
+    \label{fig:creacion}
+\end{figure}
+
+\paragraph{Lectura de usuario.}
+En la Figura~\ref{fig:red} se muestra el método \code{GET} para obtener un usuario por su ID. La entrada requerida es el identificador numérico asignado al usuario en el momento del registro.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/read_user.png}
+    \caption{Lectura de usuario (método GET). Fuente: elaboración propia.}
+    \label{fig:red}
+\end{figure}
+
+\paragraph{Actualización de usuario.}
+En la Figura~\ref{fig:upd1} se muestra el método \code{PUT} para actualizar un usuario. Se debe indicar el ID del usuario a modificar y el cuerpo de la petición sigue la misma estructura que en la creación (username, full\_name, password).
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/udpate_user.png}
+    \caption{Actualización de datos de usuario (método PUT). Fuente: elaboración propia.}
+    \label{fig:upd1}
+\end{figure}
+
+En la Figura~\ref{fig:upd2} se muestra la respuesta de la API tras la actualización y la comprobación en PostgreSQL del cambio en la tabla \code{Users}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/udpate_user_01.png}
+    \caption{Respuesta de la API y verificación en PostgreSQL tras la actualización. Fuente: elaboración propia.}
+    \label{fig:upd2}
+\end{figure}
+
+\paragraph{Eliminación de usuario.}
+En la Figura~\ref{fig:del} se muestra el método \code{DELETE} para eliminar un usuario. La entrada es el ID del usuario. La figura incluye la verificación en PostgreSQL del borrado del registro.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/delete_user.png}
+    \caption{Eliminación de usuario (método DELETE) y verificación en PostgreSQL. Fuente: elaboración propia.}
+    \label{fig:del}
+\end{figure}
+
+
+\subsubsection{Envío de código a robots y sensores}
+
+El software incluye secciones para el envío de código a los robots y para la visualización de la recepción de datos y de la lectura de sensores (Figuras~\ref{fig:sshe} y \ref{fig:sshr}). Existe un repositorio con material de apoyo que incluye grabaciones de pruebas de movimiento de los robots a través de la plataforma: \url{https://drive.google.com/drive/folders/1b15_zxTqFxxL-Ejp7-rAT0bA579dx-Zf?usp=sharing}.
+
+\paragraph{Envío de comandos a los robots.}
+En la Figura~\ref{fig:sshe} se muestra el flujo de envío de código desde la interfaz hacia el robot. El \textit{script} se transfiere por \code{scp} y se ejecuta en el robot mediante \code{ssh} y \code{rosrun sphero\_rvr\_pkg script\_executor.py}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/Control_ssh.png}
+    \caption{Envío de comandos a través de la plataforma. Fuente: elaboración propia.}
+    \label{fig:sshe}
+\end{figure}
+
+\paragraph{Recepción de datos de sensores.}
+En la Figura~\ref{fig:sshr} se muestra la recepción del resultado de la ejecución y la lectura de datos de sensores en la interfaz.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/Control_ssh_recep.png}
+    \caption{Recepción de resultados y lectura de sensores. Fuente: elaboración propia.}
+    \label{fig:sshr}
+\end{figure}
+
+
+\subsection{Autenticación y acceso}
+
+El software del laboratorio incluye una pantalla de \textit{login} que se muestra cuando no existe un \textit{token} válido en el cliente. Esta pantalla (Figura~\ref{fig:login}) permite introducir usuario y contraseña; las credenciales se envían al endpoint \code{/api/login} y, si son correctas, el \textit{Backend} devuelve un \textit{token} JWT que el \textit{Frontend} almacena y utiliza en las peticiones siguientes.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/login.png}
+    \caption{Pantalla de \textit{login} para control de acceso. Fuente: elaboración propia.}
+    \label{fig:login}
+\end{figure}
+
+\paragraph{Inicio de sesión exitoso.}
+Cuando las credenciales coinciden con un usuario registrado en la base de datos, la API devuelve el \textit{token} y el \textit{Frontend} redirige al \textit{dashboard}. En la Figura~\ref{fig:login_g} se muestra la interfaz principal tras un acceso exitoso, con el mensaje de bienvenida que utiliza el nombre completo del usuario obtenido del \textit{token}.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/correct.png}
+    \caption{Acceso exitoso al \textit{dashboard}. Fuente: elaboración propia.}
+    \label{fig:login_g}
+\end{figure}
+
+\paragraph{Inicio de sesión fallido.}
+Cuando las credenciales no son válidas, la API responde con un error de autenticación y el \textit{Frontend} muestra un mensaje de error. La Figura~\ref{fig:login_b} ilustra este comportamiento.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.5\linewidth]{images/incorrect.png}
+    \caption{Respuesta ante credenciales incorrectas. Fuente: elaboración propia.}
+    \label{fig:login_b}
+\end{figure}
+
+\paragraph{Acceso no autorizado a la API.}
+Cuando se intenta acceder a la documentación o a \textit{endpoints} protegidos sin enviar un \textit{token} válido (por ejemplo, desde el navegador sin haber iniciado sesión en el \textit{Frontend}), la API responde con un error de acceso no autorizado. La Figura~\ref{fig:API_b} muestra este comportamiento al acceder a la URL de la API sin autenticación.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/no_acces.png}
+    \caption{Acceso no autorizado a la API sin \textit{token}. Fuente: elaboración propia.}
+    \label{fig:API_b}
+\end{figure}
+
+\paragraph{Diseño adaptable.}
+La interfaz utiliza un diseño que se adapta a distintos tamaños de pantalla. En la Figura~\ref{fig:responsi} se muestra la pantalla de \textit{login} en una resolución reducida como ejemplo de este comportamiento.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=1\linewidth]{images/responsive.png}
+    \caption{Vista de la pantalla de \textit{login} en diseño adaptable. Fuente: elaboración propia.}
+    \label{fig:responsi}
+\end{figure}
+
+
+% =======================
+\section{Arquitectura que gestiona el software}
+\justifying
+
+El laboratorio adopta un diseño lógico de microservicios desacoplados donde el \textit{Frontend} (Vue.js) y el \textit{Backend} (FastAPI) evolucionan de forma independiente y se comunican únicamente por un contrato API RESTful. En despliegues típicos de laboratorio, ambos pueden ejecutarse de forma monolítica en un servidor central. El \textit{Backend} no actúa solo como API de datos, también lo hace como \textit{proxy} de ejecución remota hacia los robots (SSH/SCP), por lo que la escalabilidad está limitada por la capacidad del servidor para gestionar múltiples conexiones SSH y transferencias de comando SCP (\textit{Secure Copy Protocol}) sin bloquear el bucle de eventos de FastAPI.
+
+
+\subsection{Componentes e interacciones}
+
+Visto como un sistema, este se compone de tres nodos lógicos que interactúan por TCP/IP (\textit{Transmission Control Protocol/Internet Protocol}): (1) \textbf{Cliente (navegador)} Vue.js~3 y Axios para renderizado de la interfaz, gestión de estado, visualización de vídeo MJPEG, comunicación por HTTPS y consumo del \textit{stream} MJPEG. (2) \textbf{Servidor de aplicación} FastAPI (Python~3.8+) Uvicorn para autenticación, lógica de negocio, orquestación de \textit{scripts}, HTTP/1.1, SSHv2, SQL sobre TCP. (3) \textbf{Agente robótico (RVR)} ROS Noetic sobre Ubuntu Server en Raspberry Pi, para abstracción de hardware, control, publicación de sensores, TCPROS/UDPROS, SSH, serial UART.
+
+En la Figura~\ref{fig:entorno_uso} se muestra un esquema físico simplificado del entorno de uso: navegador, servidor, red y robot (Raspberry Pi + RVR + cámara).
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.9\linewidth]{images/fig_entorno_uso.png}
+    \caption{Entorno de uso de la plataforma: navegador, servidor, red WiFi y robot (Raspberry Pi, Sphero RVR, cámara USB). Fuente: elaboración propia.}
+    \label{fig:entorno_uso}
+\end{figure}
+
+
+\subsection{Flujo de datos: de la interfaz al robot}
+
+El flujo típico de una acción como ``mover robot'' o ``ejecutar \textit{script}'' es el siguiente. El operador pulsa un botón o sube un \textit{script} en la interfaz Vue.js; el navegador envía un \code{POST} con el \textit{payload} correspondiente. FastAPI intercepta la petición, valida el \textit{token} JWT contra la firma criptográfica y verifica permisos contra PostgreSQL. El \textit{Backend} no habla ROS directamente, por lo que invoca un subproceso que establece un túnel SSH con el robot objetivo. En el robot se ejecuta \code{rosrun} o se publica en un tópico vía línea de comandos; el nodo ROS traduce la orden a comandos UART para el Sphero RVR. El \emph{feedback} (odometría, sensores) se lee de forma asíncrona o se visualiza vía cámara. La latencia total del sistema es la suma de la latencia HTTP, la latencia de establecimiento SSH (si la conexión no es persistente) y la latencia interna de ROS.
+
+
+\subsection{\textit{Frontend} (Vue.js)}
+
+El panel está implementado en Vue~3 como \emph{Single Page Application} (SPA) y se sirve como archivos estáticos (tras \code{npm run build}) mediante un servidor web como Nginx. La pantalla de \textit{login} (Figura~\ref{fig:login}) envía credenciales al \emph{endpoint} \code{/api/login} en formato \code{application/x-www-form-urlencoded}; en caso de éxito, el \textit{Backend} devuelve un \textit{token} JWT que el \textit{Frontend} almacena en \code{localStorage} y envía en el encabezado \code{Authorization}. Las rutas del \textit{dashboard}, el editor de código (Monaco) y la visualización de vídeo y sensores están protegidas por un guard de Vue Router que redirige a \code{/login} si no hay \textit{token} válido. La \code{baseURL} de Axios debe apuntar al dominio donde se expone la API (p.\ ej.\ \code{SW-LRE-UDENAR.duckdns.org}) y coincidir con los orígenes CORS configurados en el \textit{Backend}. La visualización de vídeo se realiza incrustando la URL del \code{web\_video\_server} en una etiqueta \code{<img>}; los parámetros \code{quality}, \code{width} y \code{height} en la URL son importantes para controlar el ancho de banda y evitar saturación de la red.
+
+
+\subsection{\textit{Backend} (FastAPI)}
+
+La API utiliza FastAPI por su soporte nativo a asyncio, de manera pertinente cuando las operaciones de E/S (esperar respuesta de un robot) son frecuentes y un servidor síncrono bloquearía los \textit{workers}. Por su parte, SQLAlchemy gestiona la persistencia en PostgreSQL (\code{DATABASE\_URL} en \file{.env}). Estos modelos incluyen usuarios (contraseña hasheada con bcrypt), experimentos y robots, mientras que Pydantic define los esquemas de validación. La autenticación es realizada por OAuth2 con contraseña y el \textit{token} JWT se firma con \code{SECRET\_KEY} (HMAC-SHA256). Los \textit{routers} exponen CRUD de usuarios, experimentos y robots, y \code{POST /api/scripts/upload/} que recibe el archivo Python y la IP del robot. El módulo \file{ros\_bridge.py} escribe el \textit{script} en un archivo temporal, lo transfiere por \code{scp} y lo ejecuta por \code{ssh} con \code{rosrun sphero\_rvr\_pkg script\_executor.py}. La documentación interactiva está en \code{/admin/docs} y \code{/admin/redoc} para mayor información. Tener en cuenta que una configuración CORS incorrecta (orígenes no coincidentes con el \textit{Frontend}) es una causa frecuente de fallos en los que ``el \textit{login} funciona pero el resto no carga''.
+
+
+\subsection{Integración con ROS}
+
+En el servidor se ejecutan \code{roscore}, el nodo de cámara (\code{usb\_cam\_node}, \file{camera.launch}) y \code{web\_video\_server} (puerto 8080). El formato de píxel de la cámara (YUYV, MJPEG) debe configurarse correctamente en el \file{.launch}; si la cámara lo soporta, MJPEG reduce carga de CPU y ancho de banda USB. La ejecución de \textit{scripts} en los robots es remota: la API copia el archivo al robot y lo ejecuta en el contexto ROS; depende de que las Raspberry Pi tengan SSH activo y el paquete \code{sphero\_rvr\_pkg} instalado.
+
+
+\subsection{Seguridad y autenticación}
+
+El \textit{token} JWT consta de encabezado, \textit{payload} (\code{sub}, \code{exp}) y firma; cualquier modificación del \textit{payload} invalida la firma. Las rutas críticas (excepto \code{/login} y \code{/docs}) están protegidas por \code{get\_current\_user}; las peticiones sin \textit{token} válido reciben 401. El \textit{token} se almacena en \code{localStorage}, por lo que es vulnerable a XSS (\textit{Cross-Site Scripting}). En entornos de mayor exigencia se recomendaría usar cookies \code{httpOnly}. El \textit{stream} MJPEG (puerto 8080) en la configuración estándar de \code{web\_video\_server} no suele estar cifrado ni protegido por autenticación; cualquier equipo en la red local puede acceder a \code{http://<IP\_ROBOT>:8080}. La seguridad de los robots depende de la custodia de la clave privada SSH en el servidor.
+
+
+\subsection{Limitaciones conocidas}
+
+\begin{warningbox}
+\textbf{Vídeo:}\\
+La transmisión MJPEG envía una secuencia de imágenes JPEG completas y no aprovecha compresión inter-frame. En WiFi, un \textit{stream} 640×480 a 30\,fps puede ocupar 5--10\,Mbps. El sistema no está indicado para teleoperación de alta velocidad (p.\ ej.\ drones); la latencia típica es de 200--500\,ms en condiciones ideales y puede superar 1\,s en redes congestionadas. Para mitigar: reducir resolución (p.\ ej.\ 320×240), ajustar \code{quality} en la URL del \textit{stream}, limitar el framerate en el \file{.launch} (10--15\,fps) y usar WiFi 5\,GHz cuando sea posible.
+\end{warningbox}
+
+\begin{warningbox}
+\textbf{Odometría:}\\
+El Sphero RVR reporta odometría interna. En superficies lisas o alfombras puede haber deslizamiento (\textit{slippage}) significativo, lo que degrada la precisión de la \emph{localización a estimar}. La plataforma muestra los datos \emph{tal cual} vienen del robot, sin fusión de sensores avanzada (p.\ ej.\ EKF) en el servidor; el usuario debe esperar deriva en la posición reportada.
+\end{warningbox}
+
+\begin{tipbox}
+\textbf{Configuración y secretos:}\\
+El archivo \file{.env} no debe incluirse en el control de versiones. Variables críticas: \code{DATABASE\_URL}, \code{SECRET\_KEY} (cadena aleatoria de 32+ caracteres), \code{ALGORITHM} (HS256), \code{ACCESS\_TOKEN\_EXPIRE\_MINUTES}. Para robots: \code{ROBOT\_SSH\_USER}, \code{ROBOT\_SSH\_KEY\_PATH}. La desincronización de reloj entre cliente y servidor puede causar rechazo de \textit{tokens} JWT válidos.
+\end{tipbox}
+
+\begin{infobox}
+\textbf{Parada automática del robot (failsafe):}\\
+El Sphero RVR deja de moverse automáticamente si no recibe comandos durante aproximadamente 2 segundos. Si la conexión entre la plataforma web y el robot se interrumpe (red caída, servidor ocupado), el robot se detendrá por sí solo; no es necesario un corte de emergencia manual desde la interfaz en ese caso.
+\end{infobox}
+
+En la Figura~\ref{fig:failsafe_robot} se ilustra este comportamiento de parada automática.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.85\linewidth]{images/fig_failsafe_robot.png}
+    \caption{Comportamiento de parada automática del robot (\textit{failsafe}): sin comandos durante ~2\,s el robot se detiene. Fuente: elaboración propia.}
+    \label{fig:failsafe_robot}
+\end{figure}
+
+
+% =======================
+\section{Validación de la plataforma}
+\justifying
+
+La validación de la plataforma se centra en pruebas funcionales (\textit{login}, control de experimentos, vídeo, envío de \textit{scripts}, sensores), de integración (\textit{Frontend}, API y ROS) y de seguridad (autenticación y rechazo sin \textit{token}). A continuación se describe el plan de pruebas por componente y los casos de prueba que se recomiendan ejecutar para verificación y validación de las funcionalidades del software. La guía visual de las pantallas y funcionalidades se presenta en el Capítulo~\ref{sec:uso} (Uso de la plataforma), Figuras~\ref{fig:func_con_ex}--\ref{fig:responsi}.
+
+
+\subsection{Pruebas del \textit{Frontend}}
+
+
+\subsubsection{Control de experimentos}
+
+\textbf{Objetivo:}\\
+Verificar que el usuario puede iniciar, detener y consultar el estado de los experimentos desde la interfaz.
+
+\textbf{Casos de prueba:}\\ (1) que el usuario pueda seleccionar un experimento e iniciar su ejecución desde la interfaz; (2) que pueda detener un experimento en curso; (3) que los resultados o el estado del experimento se muestren en la interfaz de forma coherente con el comportamiento del robot.
+
+\subsubsection{Transmisión de vídeo}
+
+\textbf{Objetivo:} Comprobar que el \textit{stream} de vídeo de la cámara se muestra en el panel sin fallos evidentes de conexión.
+
+\textbf{Casos de prueba:}\\ (1) que el vídeo transmitido desde la cámara USB se visualice en el componente correspondiente; (2) que la latencia observada sea aceptable para el uso previsto (la valoración depende del ancho de banda y de la configuración del \code{web\_video\_server}).
+
+
+\subsection{Pruebas del \textit{Backend}}
+
+
+\subsubsection{API RESTful}
+
+\textbf{Objetivo:}\\
+Verificar que los \textit{endpoints} de la API responden correctamente y que los datos se persisten y recuperan de la base de datos según lo esperado.
+
+\textbf{Casos de prueba:}\\
+Operaciones CRUD sobre usuarios: (1) creación de un nuevo usuario mediante \code{POST}; (2) lectura de un usuario por ID mediante \code{GET}; (3) actualización de datos de usuario mediante \code{PUT}; (4) eliminación de un usuario mediante \code{DELETE}. En todos los casos se comprueba la respuesta de la API y, cuando aplica, el estado resultante en la base de datos PostgreSQL.
+
+
+\subsubsection{Integración con ROS}
+
+\textbf{Objetivo:}\\
+Verificar que la API puede enviar código a un robot y que la interfaz permite visualizar el envío y la recepción de datos de sensores.
+
+\textbf{Casos de prueba:}\\ (1) que el flujo de subida de \textit{script} y envío al robot (vía \code{ros\_bridge}) se complete sin error cuando el robot es alcanzable por SSH y el paquete ROS está instalado; (2) que los datos de sensores publicados por el robot (o simulados) se reflejen en la sección correspondiente de la interfaz cuando esta esté conectada a la API y a los servicios adecuados.
+
+
+\subsection{Pruebas de seguridad}
+
+
+\subsubsection{Autenticación}
+
+\textbf{Objetivo:} Asegurar que solo los usuarios registrados con credenciales correctas acceden al sistema y que las rutas protegidas rechazan peticiones sin \textit{token} válido.
+
+\textbf{Casos de prueba:}\\ (1) inicio de sesión exitoso con credenciales válidas y obtención del \textit{token}; (2) rechazo del \textit{login} con credenciales incorrectas; (3) denegación de acceso a la API cuando la petición no incluye un \textit{token} JWT válido (por ejemplo, al acceder directamente a \code{/admin/docs} o a \textit{endpoints} protegidos sin el encabezado \code{Authorization}).
+
+
+% =======================
+\section{Resolución de problemas}
+\justifying
+
+Esta sección resume los fallos más frecuentes y las acciones correctivas recomendadas, alineadas con la experiencia operativa y la documentación técnica de la plataforma. En la Figura~\ref{fig:resolucion_problemas} se presenta un resumen visual del flujo de decisión para los problemas más habituales.
+
+\begin{figure}[H]
+    \centering
+    \insertfig[width=0.95\linewidth]{images/fig_resolucion_problemas.png}
+    \caption{Resumen de resolución de problemas: errores frecuentes y acciones correctivas. Fuente: elaboración propia.}
+    \label{fig:resolucion_problemas}
+\end{figure}
+
+
+\subsection{Errores de autenticación y API}
+
+\textbf{Error:}\\
+``Method Not Allowed'' o ``401 Unauthorized'' al acceder a la API o al \textit{dashboard} tras el \textit{login}.
+
+\textbf{Causa:}\\
+\textit{token} JWT expirado o intento de acceso directo a la API sin \textit{token}. La desincronización de reloj entre el cliente y el servidor también puede hacer que el servidor rechace un \textit{token} válido (el campo \code{exp} depende de la hora del servidor).
+
+\textbf{Solución:}\\
+Cerrar sesión y volver a iniciar sesión para obtener un nuevo \textit{token}. Verificar que la hora del servidor y del cliente estén sincronizadas (NTP). Si el problema persiste, revisar los logs del \textit{Backend} y la conexión a PostgreSQL.
+
+
+\subsection{Vídeo: pantalla verde o artefactos}
+
+\textbf{Error:}\\
+El \textit{stream} de vídeo muestra pantalla verde, artefactos o no se visualiza.
+
+\textbf{Causa:}\\
+Incompatibilidad del formato de píxel (\code{pixel\_format}) con el driver de la cámara USB. Algunas cámaras soportan MJPEG en hardware; otras solo YUYV sin compresión.
+
+\textbf{Solución:}\\
+Modificar el archivo \file{.launch} del nodo \code{usb\_cam}: probar \code{pixel\_format} con \code{mjpeg} o \code{yuyv} según las capacidades de la cámara. Reducir resolución (\code{image\_width}, \code{image\_height}) y \code{framerate} si la CPU de la Raspberry Pi no alcanza.
+
+\subsection{Fallo de conexión SSH a los robots}
+\textbf{Error:}\\
+``Host key verification failed'' en los logs del \textit{Backend} al enviar un \textit{script} al robot.
+
+\textbf{Causa:}\\
+La IP del robot cambió o la clave SSH del robot no ha sido aceptada por el servidor (\textit{fingerprint} no presente en \file{known\_hosts}).
+
+\textbf{Solución:}\\
+Conectar como usuario del servidor y ejecutar \code{ssh usuario@ip\_robot} manualmente una vez para aceptar el fingerprint. Alternativamente, configurar SSH con \code{StrictHostKeyChecking no} (menos seguro, solo en entornos de confianza). Verificar que la llave privada configurada en \code{ROBOT\_SSH\_KEY\_PATH} tenga los permisos correctos y que el usuario del robot tenga acceso al directorio y al paquete ROS.
+
+
+\subsection{Latencia excesiva en vídeo o comandos}
+
+\textbf{Problema:}\\
+Latencia de más de 1\,s en el vídeo o en la respuesta del robot.
+
+\textbf{Diagnóstico:}\\
+Ejecutar \code{ping <ip\_robot>} desde el servidor. Si el ping supera 100\,ms de forma estable, el cuello de botella es la red WiFi.
+
+\textbf{Solución:}\\
+Reducir la calidad del \textit{stream} (parámetros \code{quality}, \code{width}, \code{height} en la URL del \textit{stream}), cambiar el canal WiFi para evitar interferencias, acercar el router a los robots o usar banda de 5\,GHz (802.11ac) cuando sea posible. En el \file{.launch} de la cámara, limitar el framerate a 10--15\,fps.
+
+
+\subsection{Robot no responde o no ejecuta comandos}
+
+\textbf{Problema:}\\
+El \textit{script} se envía correctamente desde la plataforma pero el robot no se mueve, no enciende LEDs o no refleja cambios.
+
+\textbf{Causas posibles:}\\
+(1) El RVR está en modo sueño (\emph{sleep}): tras un tiempo sin uso o por bajo nivel de batería, el robot puede entrar en un estado de bajo consumo en el que ignora comandos hasta recibir una señal de despertar (\code{wake}). (2) Otra aplicación está controlando el robot: si el RVR se controla simultáneamente desde la aplicación Sphero EDU u otro host por UART, los comandos pueden entrar en conflicto y el comportamiento resulta impredecible.
+
+\textbf{Solución:}\\
+Asegurarse de que el nodo ROS en la Raspberry Pi (o el \textit{script} de inicialización del paquete \code{sphero\_rvr\_pkg}) ejecute la secuencia de despertar del robot al arrancar. Cerrar la aplicación Sphero EDU y cualquier otra conexión activa al RVR antes de usar la plataforma web. Si el robot sigue sin responder, comprobar en el laboratorio que el driver ROS y el servicio correspondiente estén activos en la Raspberry Pi (véase la documentación técnica del driver RVR).
+
+
+\subsection{Resumen de acciones correctivas}
+
+En la Tabla~\ref{tab:troubleshooting} se resume una matriz de pruebas funcionales recomendada y las acciones correctivas asociadas cuando una prueba falla.
+
+\begin{table}[htbp]
+\centering
+\caption{Pruebas funcionales y acciones correctivas ante fallo}
+\label{tab:troubleshooting}
+\begin{tabular}{p{0.22\textwidth}p{0.28\textwidth}p{0.22\textwidth}}
+\toprule
+\textbf{Prueba} & \textbf{Resultado esperado} & \textbf{Acción si falla} \\
+\midrule
+\textit{login} con credenciales válidas & Redirección a \textit{dashboard}; \textit{token} en \code{localStorage} & Verificar conexión a PostgreSQL; revisar logs del \textit{Backend}; comprobar CORS y \code{baseURL} del \textit{Frontend}. \\
+Visualización de vídeo & Imagen fluida en el \textit{dashboard} & Verificar que \code{web\_video\_server} esté activo en el robot; comprobar firewall (puerto 8080); revisar \code{pixel\_format} en \code{usb\_cam}. \\
+Envío de \textit{script} simple (p.\ ej.\ LEDs) & El robot ejecuta la acción física & Verificar claves SSH; comprobar que el servicio ROS y \code{sphero\_rvr\_pkg} estén activos en el robot; revisar \code{ros\_bridge.py} y timeouts. \\
+Persistencia de usuario & Los datos se mantienen tras reinicio del servidor & Verificar que PostgreSQL esté en un volumen persistente; revisar \code{DATABASE\_URL} en \file{.env}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Con la introducción, el acceso, el uso de la plataforma, la descripción de la arquitectura y limitaciones, la validación y esta guía de resolución de problemas, el documento constituye una referencia completa para operar la plataforma SW-LRE-UDENAR e interpretar y resolver los fallos más habituales.
+
+\end{document}

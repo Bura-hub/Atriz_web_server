@@ -53,3 +53,35 @@ async def stop_command_on_robot(robot_ip: str = Form(...)):
         return {"status": "success", "message": "Comando detenido."}
     else:
         raise HTTPException(status_code=404, detail="No hay comando en ejecución para este robot.")
+
+
+@router.post("/robots/emergency-stop/")
+async def emergency_stop_robot(robot_ip: str = Form(...)):
+    """
+    Parada de emergencia (E-Stop): publica en /rvr/emergency_stop en el robot
+    para cortar potencia y sobrescribir comandos según el driver.
+    """
+    user = os.getenv("SSH_USER", "ubuntu")
+    # std_msgs/Empty: rostopic pub -1 /rvr/emergency_stop std_msgs/Empty "{}"
+    command = "rostopic pub -1 /rvr/emergency_stop std_msgs/Empty '{}'"
+    try:
+        ssh_cmd = [
+            "ssh", f"{user}@{robot_ip}",
+            f"source /opt/ros/noetic/setup.bash; source ~/atriz_git/devel/setup.bash; {command}"
+        ]
+        result = subprocess.run(
+            ssh_cmd,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Error en el robot: {result.stderr or result.stdout or 'unknown'}"
+            )
+        return {"status": "success", "message": "Parada de emergencia enviada."}
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=504, detail="Timeout al contactar con el robot.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al ejecutar parada de emergencia: {str(e)}")

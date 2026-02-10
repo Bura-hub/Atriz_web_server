@@ -1,32 +1,39 @@
 <template>
-  <div class="bg-gray-900 text-white font-sans">
-    <div class="container mx-auto p-4">
+  <div class="dashboard">
+    <div class="dashboard__inner">
       <AppHeader />
-      <p v-if="fullName" class="welcome-message">
-        <span>Bienvenido, </span>
-        <span class="animated-name">{{ fullName }}</span>
-      </p>
+      <div class="welcome-block">
+        <p class="welcome-message">
+          <span>Bienvenido, </span>
+          <span class="welcome-message__name">{{ fullName }}</span>
+        </p>
+      </div>
 
-      <!-- Stream de video -->
-      <VideoStream />
-      <div class="my-8"></div>
-
-      <!-- Sección de dashboards y datos -->
-      <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <RobotDashboard />
-        <BatterySensorData />
+      <!-- Manual: Control de experimentos y vídeo -->
+      <section class="dashboard-section" aria-labelledby="sec-exp-video">
+        <h2 id="sec-exp-video" class="dashboard-section__heading">Control de experimentos y vídeo</h2>
+        <div class="grid grid-cols-1 gap-6">
+          <VideoStream />
+          <RobotDashboard />
+        </div>
       </section>
 
-      <!-- Sección para ejecutar comandos en la Raspberry Pi -->
-      <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <PythonCode /> <!-- Componente actualizado de PythonCode -->
-        <ExecuteCommand />
+      <!-- Manual: Envío de código a robots y sensores -->
+      <section class="dashboard-section" aria-labelledby="sec-codigo-sensores">
+        <h2 id="sec-codigo-sensores" class="dashboard-section__heading">Envío de código a robots y sensores</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <PythonCode />
+          <ExecuteCommand />
+          <BatterySensorData />
+        </div>
       </section>
 
-      <!-- Código Python y Resultados de Experimentos -->
-      <ExperimentResults />
+      <!-- Apartado de resultados (manual: respuesta de los prototipos) -->
+      <section class="dashboard-section" aria-labelledby="sec-resultados">
+        <h2 id="sec-resultados" class="dashboard-section__heading">Resultados</h2>
+        <ExperimentResults />
+      </section>
 
-      <!-- Footer de la aplicación -->
       <AppFooter />
     </div>
   </div>
@@ -70,39 +77,47 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos del Dashboard */
+.dashboard {
+  @apply text-gray-100 font-sans;
+}
+
+.dashboard__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard__inner {
+    padding: 2rem 1.5rem 3rem;
+  }
+}
+
+.welcome-block {
+  margin-bottom: 1.5rem;
+}
+
 .welcome-message {
-  font-family: 'Roboto', sans-serif; 
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.welcome-message__name {
+  color: var(--accent);
   font-weight: 700;
-  color: #ffffff;
+}
+
+.dashboard-section {
+  margin-bottom: 2rem;
+}
+
+.dashboard-section__heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 1rem;
-}
-
-/* Estilo estático para "Bienvenido," */
-.welcome-message span:first-of-type {
-  color: #ffffff;
-}
-
-/* Nombre con animación de cambio de color */
-.animated-name {
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  animation: colorChange 3s infinite;
-}
-
-/* Animación de cambio de color */
-@keyframes colorChange {
-  0% {
-    color: #0b56ac;
-  }
-  50% {
-    color: #ffffff;
-  }
-  100% {
-    color: #0b56ac;
-  }
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-default);
 }
 </style>

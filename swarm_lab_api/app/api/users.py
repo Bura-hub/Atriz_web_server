@@ -5,7 +5,7 @@ from app.schemas.user import UserCreate, User, Token
 from app.db.session import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 from app.core.security import verify_password, create_access_token
-from datetime import timedelta
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -53,9 +53,8 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=1)
     access_token = create_access_token(
-        data={"sub": user.username, "full_name": user.full_name}, 
-        expires_delta=access_token_expires
+        data={"sub": user.username, "full_name": user.full_name},
+        expires_delta=None  # usa ACCESS_TOKEN_EXPIRE_MINUTES de config
     )
     return {"access_token": access_token, "token_type": "bearer"}

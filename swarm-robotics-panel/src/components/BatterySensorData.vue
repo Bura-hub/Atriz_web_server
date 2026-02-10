@@ -1,22 +1,29 @@
 <template>
-    <div class="bg-gray-800 p-6 rounded-lg">
-      <h2 class="text-xl md:text-2xl mb-4">Datos de batería y sensores</h2>
-      <div class="mb-4">
-        <p class="mb-2">Nivel de Batería</p>
-        <div class="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
-          <div class="bg-blue-500 h-full" :style="{ width: batteryLevel + '%' }"></div>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div v-for="sensor in sensorStatuses" :key="sensor.name" class="bg-gray-700 p-4 rounded-md">
-          <p>{{ sensor.name }}</p>
-          <p :class="sensor.active ? 'text-green-400' : 'text-red-400'">
-            {{ sensor.active ? 'Active' : 'Inactive' }}
-          </p>
-        </div>
+  <div class="card-panel">
+    <h2 class="section-title">Datos de batería y sensores</h2>
+    <div class="mb-4">
+      <p class="text-sm font-medium label-muted mb-2">Nivel de batería</p>
+      <div class="battery-track">
+        <div
+          class="battery-fill"
+          :style="{ width: batteryLevel + '%' }"
+        ></div>
       </div>
     </div>
-  </template>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div
+        v-for="sensor in sensorStatuses"
+        :key="sensor.name"
+        class="sensor-card"
+      >
+        <p class="font-medium sensor-card__name">{{ sensor.name }}</p>
+        <p :class="sensor.active ? 'status-active' : 'status-inactive'" class="text-sm mt-1">
+          {{ sensor.active ? 'Activo' : 'Inactivo' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
   
   <script>
   export default {
