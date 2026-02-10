@@ -51,11 +51,30 @@ async def execute_script(script_name: str):
     results = execute_script_in_all_pis(script_name)
     return {"execution_results": results}
 
+# Experimentos de demostración según documentación (manual/desarrollo) cuando no hay robots conectados
+DEMO_SCRIPTS = [
+    "experimento_movimiento_basico.py",
+    "lectura_sensores_imu.py",
+    "calibracion_leds_rvr.py",
+    "odometria_y_telemetria.py",
+]
+
 @router.get("/list-scripts")
 async def list_scripts():
     """
     Endpoint para listar los scripts Python en el directorio remoto de todas las Raspberry Pi.
-    :return: Diccionario con los scripts disponibles en cada Raspberry Pi.
+    Si no hay scripts disponibles (sin robots o SSH fallido), devuelve lista de demostración.
+    :return: Diccionario con los scripts disponibles por host y opcionalmente "demo": true.
     """
     scripts = list_scripts_in_all_pis()
-    return {"scripts": scripts}
+    # Unir todos los nombres de scripts de todos los hosts (solo listas válidas)
+    all_names = []
+    for host, value in scripts.items():
+        if isinstance(value, list):
+            all_names.extend(value)
+        # si value es dict con "error", se ignora
+    all_names = sorted(set(all_names))
+    if not all_names:
+        scripts["_demo"] = DEMO_SCRIPTS
+        return {"scripts": scripts, "demo": True}
+    return {"scripts": scripts, "demo": False}

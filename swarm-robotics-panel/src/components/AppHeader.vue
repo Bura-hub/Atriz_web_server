@@ -15,11 +15,14 @@
       </a>
       <button
         type="button"
-        @click="logout"
+        @click="handleLogout"
         class="app-header__logout"
+        :class="{ 'app-header__logout--closing': loggingOut }"
+        :disabled="loggingOut"
         aria-label="Cerrar sesión"
       >
-        <span class="app-header__logout-text">Cerrar sesión</span>
+        <span v-if="loggingOut" class="app-header__logout-spinner"></span>
+        <span class="app-header__logout-text">{{ loggingOut ? 'Cerrando sesión…' : 'Cerrar sesión' }}</span>
       </button>
     </div>
   </header>
@@ -30,16 +33,25 @@ const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
 const apiBase = apiUrl.replace(/\/api\/?$/, '') || 'http://localhost:5000';
 export default {
   name: 'AppHeader',
+  data() {
+    return {
+      loggingOut: false,
+    };
+  },
   computed: {
     apiDocsUrl() {
       return `${apiBase}/admin/docs`;
     },
   },
   methods: {
-    logout() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('full_name');
-      this.$router.push('/login');
+    handleLogout() {
+      if (this.loggingOut) return;
+      this.loggingOut = true;
+      setTimeout(() => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('full_name');
+        this.$router.push('/login');
+      }, 450);
     },
   },
 };
@@ -121,6 +133,29 @@ export default {
 
 .app-header__logout-text {
   display: inline-block;
+}
+
+.app-header__logout--closing {
+  opacity: 0.9;
+  cursor: wait;
+}
+
+.app-header__logout-spinner {
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: header-logout-spin 0.6s linear infinite;
+}
+
+@keyframes header-logout-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .app-header__link {

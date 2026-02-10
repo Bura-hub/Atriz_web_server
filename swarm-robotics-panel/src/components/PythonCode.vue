@@ -8,13 +8,29 @@
     </div>
 
     <div class="flex flex-wrap gap-2 mb-4">
-      <button v-if="selectedFile" type="button" @click="openEditor" class="btn-success">
+      <button v-if="selectedFile" type="button" @click="openEditor" class="btn-success btn-press">
         Visualizar y editar script
       </button>
-      <button type="button" @click="uploadScript" class="btn-primary">
-        Subir script
+      <button type="button" @click="uploadScript" class="btn-primary btn-press" :disabled="uploadLoading">
+        <span v-if="uploadLoading" class="spinner-inline"></span>
+        <span v-if="uploadLoading">Subiendo…</span>
+        <span v-else>Subir script</span>
       </button>
     </div>
+
+    <!-- Pasos simulados según desarrollo.tex: recepción → almacenamiento → SCP → SSH -->
+    <div v-if="uploadSteps.length" class="steps-progress mb-3">
+      <span
+        v-for="(step, i) in uploadSteps"
+        :key="i"
+        class="steps-progress__dot"
+        :class="{ 'steps-progress__dot--active': step.active, 'steps-progress__dot--done': step.done }"
+        :title="step.label"
+      ></span>
+    </div>
+    <p v-if="uploadSteps.length" class="text-sm label-muted mb-2 sim-step">
+      {{ uploadSteps.find(s => s.active)?.label || uploadSteps[uploadSteps.length - 1]?.label }}
+    </p>
 
     <section v-if="commandOutput" class="mt-4">
       <h3 class="results-box__title">Resultado de la operación</h3>
@@ -51,6 +67,8 @@ export default {
       commandOutput: "",
       isEditorOpen: false,
       monacoEditor: null,
+      uploadLoading: false,
+      uploadSteps: [],
     };
   },
   methods: {
@@ -112,22 +130,60 @@ export default {
         return;
       }
 
-      const formData = new FormData();
-      const file = new Blob([this.fileContent], { type: "text/plain" });
-      formData.append("file", file, this.selectedFile.name);
+      const steps = [
+        { label: "Validando archivo (.py) y tamaño…", active: false, done: false },
+        { label: "Almacenamiento temporal en servidor…", active: false, done: false },
+        { label: "Transferencia SCP al robot…", active: false, done: false },
+        { label: "Ejecución SSH: rosrun sphero_rvr_pkg script_executor.py…", active: false, done: false },
+      ];
+      this.uploadSteps = steps;
+      this.uploadLoading = true;
+      this.commandOutput = "";
+
+      const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      const setStep = (index, active, done) => {
+        this.uploadSteps = this.uploadSteps.map((s, i) => ({
+          ...s,
+          active: i === index && active,
+          done: i < index || (i === index && done),
+        }));
+      };
 
       try {
+        setStep(0, true, false);
+        await delay(400);
+        setStep(0, false, true);
+        setStep(1, true, false);
+        await delay(350);
+        setStep(1, false, true);
+        setStep(2, true, false);
+        await delay(500);
+
+        const formData = new FormData();
+        const file = new Blob([this.fileContent], { type: "text/plain" });
+        formData.append("file", file, this.selectedFile.name);
+
         const response = await axios.post("/upload-script", formData);
         const data = response.data;
 
+        setStep(2, false, true);
+        setStep(3, true, false);
+        await delay(300);
+        setStep(3, false, true);
+
         if (data.status === "success") {
-          this.commandOutput = "Archivo enviado exitosamente a las Raspberry Pi.";
+          this.commandOutput = "Archivo enviado exitosamente a las Raspberry Pi.\n[SCP → robot] Ejecución disponible vía script_executor.";
         } else {
           this.commandOutput = `Error: ${data.details || data.detail || "desconocido"}`;
         }
       } catch (error) {
         console.error("Error al enviar el archivo:", error);
         this.commandOutput = error.response?.data?.detail || error.message || "Error al intentar subir el archivo.";
+        this.uploadSteps = this.uploadSteps.map((s) => ({ ...s, done: true, active: false }));
+      } finally {
+        this.uploadLoading = false;
+        this.uploadSteps = [];
       }
     },
   },

@@ -12,10 +12,16 @@
         <input v-model="command" type="text" placeholder="Comando a ejecutar" required class="input-field" />
       </div>
       <div class="flex flex-wrap gap-2">
-        <button type="submit" class="btn-primary">Ejecutar comando</button>
-        <button type="button" @click="stopCommand" :disabled="!robotIp" class="btn-danger">Detener</button>
+        <button type="submit" class="btn-primary btn-press" :disabled="execLoading">
+          <span v-if="execLoading" class="spinner-inline"></span>
+          <span v-if="execLoading">Ejecutando…</span>
+          <span v-else>Ejecutar comando</span>
+        </button>
+        <button type="button" @click="stopCommand" :disabled="!robotIp || execLoading" class="btn-danger btn-press">Detener</button>
       </div>
     </form>
+
+    <p v-if="execStep" class="text-sm label-muted mb-2 sim-step">{{ execStep }}</p>
 
     <section v-if="commandOutput" class="mt-4">
       <h3 class="results-box__title">Salida del comando</h3>
@@ -33,11 +39,17 @@
       return {
         robotIp: '',
         command: '',
-        commandOutput: ''
+        commandOutput: '',
+        execLoading: false,
+        execStep: '',
       };
     },
     methods: {
       async executeCommand() {
+        this.execLoading = true;
+        this.execStep = 'Conectando por SSH al robot…';
+        await new Promise((r) => setTimeout(r, 350));
+        this.execStep = 'Ejecutando comando en la Raspberry Pi…';
         try {
           const response = await axios.post('/robots/execute/', qs.stringify({
             robot_ip: this.robotIp,
@@ -46,10 +58,14 @@
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
           });
           const data = response.data;
+          this.execStep = 'Comando ejecutado. Recibiendo salida.';
           this.commandOutput = data.result != null ? data.result : (data.detail || JSON.stringify(data));
         } catch (error) {
           console.error('Error ejecutando el comando:', error);
           this.commandOutput = error.response?.data?.detail || error.message || 'Error al ejecutar el comando.';
+        } finally {
+          this.execLoading = false;
+          this.execStep = '';
         }
       },
       async stopCommand() {

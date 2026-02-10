@@ -45,10 +45,16 @@
         alt="Stream del robot"
         class="video-feed video-feed--img"
         ref="mjpegImg"
+        @load="onMjpegLoad"
+        @error="onMjpegError"
       />
       <p v-if="error" class="video-message video-message--error">{{ error }}</p>
       <p v-else-if="source === 'local' && !streamActive && !loading" class="video-message">Tu cámara se mostrará aquí.</p>
       <p v-else-if="source === 'robot' && !mjpegUrl" class="video-message">Indica la IP del robot para ver el stream MJPEG.</p>
+      <p v-else-if="source === 'robot' && streamConnecting" class="video-message video-message--connecting">
+        <span class="spinner-inline"></span>
+        Conectando al stream MJPEG (web_video_server)…
+      </p>
       <p v-else-if="source === 'robot' && mjpegUrl" class="video-message video-message--hint">Stream del robot (web_video_server).</p>
       <p v-else-if="loading" class="video-message">Solicitando acceso a la cámara…</p>
       <button @click="toggleFullscreen" class="fullscreen-btn">
@@ -73,7 +79,21 @@ export default {
       streamActive: false,
       loading: false,
       error: null,
+      streamConnecting: false,
+      streamConnectTimeout: null,
     };
+  },
+  watch: {
+    mjpegUrl(url) {
+      if (this.source === 'robot' && url) {
+        this.streamConnecting = true;
+        this.error = null;
+        clearTimeout(this.streamConnectTimeout);
+        this.streamConnectTimeout = setTimeout(() => {
+          if (this.streamConnecting) this.streamConnecting = false;
+        }, 4000);
+      }
+    },
   },
   computed: {
     mjpegUrl() {
@@ -88,12 +108,23 @@ export default {
   methods: {
     onSourceChange() {
       if (this.source === "local") {
+        this.streamConnecting = false;
+        clearTimeout(this.streamConnectTimeout);
         this.error = null;
         this.startCamera();
       } else {
         this.stopCamera();
         this.error = null;
+        if (this.mjpegUrl) this.streamConnecting = true;
       }
+    },
+    onMjpegLoad() {
+      this.streamConnecting = false;
+      clearTimeout(this.streamConnectTimeout);
+    },
+    onMjpegError() {
+      this.streamConnecting = false;
+      clearTimeout(this.streamConnectTimeout);
     },
     async startCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {

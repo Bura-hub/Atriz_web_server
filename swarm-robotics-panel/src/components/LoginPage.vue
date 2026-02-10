@@ -1,9 +1,27 @@
 <template>
   <div class="login-wrapper">
-    <div class="login-card">
-      <h1 class="login-card__title">SW-LRE-UDENAR</h1>
-      <p class="login-card__subtitle">Plataforma Atriz — Inicio de sesión</p>
-      <form @submit.prevent="login" class="login-form">
+    <div
+      class="login-card"
+      :class="{
+        'login-card--loading': loading,
+        'login-card--success': loginSuccess,
+        'login-card--enter': cardEnter
+      }"
+    >
+      <div v-if="loginSuccess" class="login-success">
+        <span class="login-success__icon" aria-hidden="true">✓</span>
+        <p class="login-success__text">Sesión iniciada</p>
+        <p class="login-success__sub">Redirigiendo al panel…</p>
+      </div>
+      <template v-else>
+        <div class="login-card__header">
+          <img src="/logo.png" alt="Logo Plataforma Atriz" class="login-card__logo" />
+          <div class="login-card__titles">
+            <h1 class="login-card__title">SW-LRE-UDENAR</h1>
+            <p class="login-card__subtitle">Plataforma Atriz — Inicio de sesión</p>
+          </div>
+        </div>
+        <form @submit.prevent="login" class="login-form">
         <div class="input-group">
           <label for="username">Nombre de usuario</label>
           <input
@@ -30,12 +48,13 @@
             :disabled="loading"
           />
         </div>
-        <button type="submit" class="login-card__btn" :disabled="loading">
+        <button type="submit" class="login-card__btn btn-press" :disabled="loading">
           <span v-if="loading" class="login-card__btn-spinner"></span>
           <span v-else>Acceder</span>
         </button>
         <p v-if="error" class="login-card__error" role="alert">{{ error }}</p>
       </form>
+      </template>
     </div>
   </div>
 </template>
@@ -52,7 +71,14 @@ export default {
       password: '',
       error: null,
       loading: false,
+      loginSuccess: false,
+      cardEnter: false,
     };
+  },
+  mounted() {
+    requestAnimationFrame(() => {
+      this.cardEnter = true;
+    });
   },
   methods: {
     async login() {
@@ -68,7 +94,11 @@ export default {
         localStorage.setItem('access_token', accessToken);
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         localStorage.setItem('full_name', payload.full_name || this.username);
-        this.$router.push('/');
+        this.loading = false;
+        this.loginSuccess = true;
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 900);
       } catch (err) {
         const status = err.response?.status;
         const detail = err.response?.data?.detail;
@@ -94,36 +124,104 @@ export default {
   justify-content: center;
   min-height: 100vh;
   padding: 1.5rem;
-  background: url('../assets/login-background_1.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
-
-.login-wrapper::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: rgba(11, 15, 26, 0.72);
-  backdrop-filter: blur(8px);
-  z-index: 0;
 }
 
 .login-card {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 400px;
+  max-width: 520px;
   padding: 2rem;
   background: var(--bg-surface);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-lg);
+  transition: opacity 0.25s ease, transform 0.35s ease;
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+}
+
+.login-card--enter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.login-card--loading {
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.login-card--success {
+  text-align: center;
+  padding: 2.5rem 2rem;
+}
+
+.login-success {
+  animation: login-success-in 0.4s ease;
+}
+
+.login-success__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.login-success__text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.login-success__sub {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+@keyframes login-success-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.login-card__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-card__logo {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.login-card__titles {
+  flex: 1;
+  min-width: 0;
 }
 
 .login-card__title {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
-  text-align: center;
+  text-align: left;
   margin-bottom: 0.25rem;
   letter-spacing: -0.02em;
 }
@@ -131,8 +229,8 @@ export default {
 .login-card__subtitle {
   font-size: 1rem;
   color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: 1.5rem;
+  text-align: left;
+  margin-bottom: 0;
 }
 
 .login-form {
