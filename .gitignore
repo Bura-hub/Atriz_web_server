@@ -1,0 +1,39 @@
+# Entornos virtuales Python
+swarm_lab_env/
+venv/
+.venv/
+env/
+
+# Dependencias Node (raíz y panel)
+node_modules/
+
+# Build y artefactos
+dist/
+build/
+devel/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+
+# Base de datos local y env
+*.db
+.env
+.env.local
+.env.*.local
+
+# IDE y OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
