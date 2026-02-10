@@ -1,0 +1,31 @@
+---
+description: Convenciones para ROS, launch files y scripts bash del lab
+globs: "**/*.launch, **/*.sh, src/**/*"
+alwaysApply: false
+---
+
+# ROS, launch files y scripts del lab
+
+## Launch files (XML)
+
+- Ubicación típica: `src/web_server/launch/` (p. ej. `camera.launch`, `web_video.launch`).
+- Nodos con `<node pkg="..." type="..." name="..." output="screen">`.
+- Parámetros con `<param name="..." value="..." />`.
+- Mantener nombres de paquete y tipos coherentes con los definidos en `package.xml` y ejecutables del workspace.
+
+## Scripts bash (start/stop del lab)
+
+- `start_atriz_lab.sh`: Inicia roscore, nginx, cámara (roslaunch), web_video_server, API (uvicorn) y build del panel Vue. Usa logging con timestamps y colores (`log INFO/SUCCESS/WARNING/ERROR`). Libera puertos (fuser -k) y termina procesos previos (pkill) antes de arrancar.
+- `stop.sh`: Detiene roscore, roslaunch, nginx y libera puertos.
+- Rutas que dependen del entorno: `~/catkin_ws/swarm_lab_env`, `~/catkin_ws/swarm_lab_api`, `~/catkin_ws/swarm-robotics-panel`. No asumir Windows; los scripts están pensados para Linux.
+- Al modificar servicios o puertos, mantener la coherencia entre `start_atriz_lab.sh` y `stop.sh` (mismos puertos y procesos a matar).
+
+## Paquetes ROS en el workspace
+
+- `src/web_server`: servicio web y launch de cámara/web_video.
+- `src/robotnik_msgs`: mensajes/servicios Robotnik.
+- Otros paquetes en `src/` (path_planning, summit_xl_common, etc.) y en `demiurge-tycho/` (tycho_aruco, tycho_transformer). Respetar `package.xml` y `CMakeLists.txt` al añadir nodos o dependencias.
+
+## Robots (SSH y ROS)
+
+- En los comandos que se ejecutan en robots (p. ej. desde la API), hacer siempre `source /opt/ros/noetic/setup.bash` y, si aplica, `source ~/atriz_git/devel/setup.bash` antes del comando o script.

@@ -1,0 +1,51 @@
+---
+description: Estándares y estructura de la API FastAPI (swarm_lab_api)
+globs: swarm_lab_api/**/*.py
+alwaysApply: false
+---
+
+# Swarm Lab API — FastAPI
+
+La API vive en `swarm_lab_api/app/`. Sigue esta estructura y convenciones.
+
+## Estructura de la aplicación
+
+- `main.py`: Crea la app FastAPI, CORS, monta routers con `prefix="/api"`. No incluir credenciales ni IPs hardcodeadas en producción; usar `app/core/config` o variables de entorno.
+- `api/`: Routers por dominio (experiments, robots, users, scripts, files, updates). Cada router usa `APIRouter()` y se incluye en `main.py`.
+- `core/`: Configuración (`config.py` con Pydantic `BaseSettings`, `.env`), seguridad, SSH, utilidades.
+- `crud/`: Operaciones de base de datos (por entidad: experiments, robots, scripts, users).
+- `db/session.py`: `get_db()` como generator con `SessionLocal`, `Base` para modelos.
+- `models/`: Modelos SQLAlchemy (ORM).
+- `schemas/`: Modelos Pydantic para request/response. Usar `orm_mode = True` en schemas que representan entidades ORM.
+- `dependencies.py`: Dependencias globales (ej. `get_current_user` para JWT).
+
+## Patrones a seguir
+
+- Endpoints que necesiten BD: inyectar `db: Session = Depends(get_db)`.
+- Respuestas con entidades: usar `response_model` con schemas de `app/schemas/`.
+- Errores: `raise HTTPException(status_code=..., detail="...")` con mensajes claros.
+- Configuración y secretos: leer desde `app.core.config.settings` o variables de entorno; no hardcodear en el código.
+- Comunicación con robots (SSH/ROS): reutilizar `app.ros_bridge` o `app.core.ssh_manager` cuando existan; comandos ROS con `source /opt/ros/noetic/setup.bash` (y workspace si aplica) antes del comando.
+
+## Tests
+
+- Tests en `swarm_lab_api/tests/` (pytest). Mantener cobertura de endpoints críticos y CRUD.
+
+## Ejemplo de estilo de endpoint
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.crud.robots import get_robot
+from app.schemas.robot import Robot
+
+router = APIRouter()
+
+@router.get("/robots/{robot_id}", response_model=Robot)
+def read_robot(robot_id: int, db: Session = Depends(get_db)):
+    robot = get_robot(db, robot_id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    return robot
+```

@@ -18,7 +18,7 @@ async def upload_new_script(file: UploadFile = File(...), robot_ip: str = Form(.
     Returns:
         dict: Resultado de la ejecución del script.
     """
-    user = os.getenv("SSH_USER", "sphero")  # Usa el usuario predeterminado
+    user = os.getenv("SSH_USER", "ubuntu")  # Usa el usuario predeterminado
     temp_file_path = "/tmp/script.py"  # Ruta temporal en la Raspberry Pi
 
     try:

@@ -7,6 +7,7 @@ from app.db.session import get_db
 from app.core.ssh_manager import execute_remote_command
 import os
 import psutil  # Librería para trabajar con procesos
+from app.core import raspberry_config as credenciales
 
 router = APIRouter()
 
@@ -28,53 +29,67 @@ class ScriptExecutionRequest(BaseModel):
 
 @router.post("/start-experiment")
 async def start_experiment(request: ScriptRequest):
-    raspberry_ip = "10.20.50.29"  # Cambia por la IP de tu Raspberry Pi
-    raspberry_user = "sphero"  # Usuario de la Raspberry Pi
-    raspberry_password = "admin2024"  # Contraseña de la Raspberry Pi
-
     command = f"python3 scripts/{request.script_name}"
+    results = []
 
-    try:
-        # Ejecutar el comando en la Raspberry Pi
-        output, error = execute_remote_command(raspberry_ip, raspberry_user, raspberry_password, command)
+    for config in credenciales.RASPBERRY_PI_CONFIGS:
+        try:
+            output, error = execute_remote_command(
+                ip=config["host"],
+                username=config["username"],
+                password=config["password"],
+                command=command
+            )
 
-        if error:
-            raise HTTPException(status_code=400, detail=f"Error al ejecutar el script: {error}")
+            if error:
+                results.append({"host": config["host"], "status": "error", "message": error})
+            else:
+                results.append({"host": config["host"], "status": "success", "output": output})
 
-        return {"status": "success", "output": output}
+        except Exception as e:
+            results.append({"host": config["host"], "status": "error", "message": str(e)})
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al conectar o ejecutar el comando: {str(e)}")
-    
+    return results
 
-    # Endpoint para detener el script en la Raspberry Pi
+
 @router.post("/stop-script")
 async def stop_script(request: ScriptExecutionRequest):
-    # Definir la IP, usuario y contraseña de la Raspberry Pi
-    raspberry_ip = "10.20.50.29"  # Cambia por la IP de tu Raspberry Pi
-    raspberry_user = "sphero"  # Usuario de la Raspberry Pi
-    raspberry_password = "admin2024"  # Contraseña de la Raspberry Pi
+    command = f"pgrep -f {request.script_name}"
+    results = []
 
-    try:
-        # Buscar el proceso del script en ejecución
-        command = f"pgrep -f {request.script_name}"
-        pid_output, error = execute_remote_command(raspberry_ip, raspberry_user, raspberry_password, command)
+    for config in credenciales.RASPBERRY_PI_CONFIGS:
+        try:
+            pid_output, error = execute_remote_command(
+                ip=config["host"],
+                username=config["username"],
+                password=config["password"],
+                command=command
+            )
 
-        if error:
-            raise HTTPException(status_code=400, detail=f"Error al obtener el PID: {error}")
+            if error:
+                results.append({"host": config["host"], "status": "error", "message": error})
+                continue
 
-        if not pid_output.strip():
-            raise HTTPException(status_code=404, detail="No se encontró ningún proceso en ejecución con ese script.")
+            if not pid_output.strip():
+                results.append({"host": config["host"], "status": "not_found", "message": "No se encontró el proceso."})
+                continue
 
-        # Si se encontró el PID, ejecutamos el comando para detener el proceso
-        pid = pid_output.strip()  # Obtener el PID del proceso
-        kill_command = f"kill {pid}"  # Comando para detener el proceso
-        kill_output, kill_error = execute_remote_command(raspberry_ip, raspberry_user, raspberry_password, kill_command)
+            # Si se encontró el PID, detener el proceso
+            pid = pid_output.strip()
+            kill_command = f"kill {pid}"
+            kill_output, kill_error = execute_remote_command(
+                ip=config["host"],
+                username=config["username"],
+                password=config["password"],
+                command=kill_command
+            )
 
-        if kill_error:
-            raise HTTPException(status_code=400, detail=f"Error al detener el proceso: {kill_error}")
+            if kill_error:
+                results.append({"host": config["host"], "status": "error", "message": kill_error})
+            else:
+                results.append({"host": config["host"], "status": "success", "message": "Script detenido."})
 
-        return {"status": "success", "message": "El script ha sido detenido correctamente."}
+        except Exception as e:
+            results.append({"host": config["host"], "status": "error", "message": str(e)})
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al intentar detener el script: {str(e)}")
+    return results

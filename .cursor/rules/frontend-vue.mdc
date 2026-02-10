@@ -1,0 +1,26 @@
+---
+description: Convenciones del panel Vue (swarm-robotics-panel)
+globs: swarm-robotics-panel/**/*
+alwaysApply: false
+---
+
+# Swarm Robotics Panel — Vue 3
+
+Frontend en `swarm-robotics-panel/`: Vue 3, Vue Router, Tailwind CSS, Axios, Monaco Editor (código), Prism.js.
+
+## Estructura
+
+- `src/main.js`: entrada de la app.
+- `src/App.vue`: raíz.
+- `src/components/`: componentes (LoginPage, MainDashboard, RobotDashboard, ExecuteCommand, VideoStream, ExperimentResults, PythonCode, etc.).
+- `src/router/index.js`: rutas.
+- `src/utils/axios.js`: instancia de Axios (base URL de la API).
+- `src/assets/`: estilos e imágenes.
+
+## Convenciones
+
+- Usar Vue 3 (Composition API o Options API según el resto del proyecto).
+- Llamadas a la API: usar la instancia configurada en `src/utils/axios.js` para mantener base URL y posibles interceptors.
+- La API del backend está en `/api` (puerto 5000 en desarrollo; Nginx en producción). Asegurar que la base URL en axios coincida con el entorno.
+- Estilos: Tailwind; estilos globales en `src/assets/styles.css` si aplica.
+- El panel se sirve tras `npm run build`; en `start_atriz_lab.sh` se construye desde `~/catkin_ws/swarm-robotics-panel`.

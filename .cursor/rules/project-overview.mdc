@@ -1,0 +1,38 @@
+---
+description: Visión general del proyecto Atriz / Swarm Lab (stack, estructura, convenciones)
+alwaysApply: true
+---
+
+# Atriz Web Server / Swarm Lab
+
+Proyecto de laboratorio de **robótica swarm** (SW-AR-LabRE) que integra ROS, una API REST y un panel web para control y experimentos.
+
+## Stack principal
+
+- **ROS**: Noetic, catkin workspace. Paquetes en `src/` (web_server, robotnik_msgs, path_planning, summit_xl_common, etc.) y `demiurge-tycho/` (tycho_aruco, tycho_transformer, tycho_launchers).
+- **API**: FastAPI en `swarm_lab_api/` (Python 3.8), servida con Uvicorn en puerto **5000**.
+- **Base de datos**: PostgreSQL (configuración en `app/core/config.py`, variable `DATABASE_URL`).
+- **Frontend**: Vue.js en `swarm-robotics-panel/` (Tailwind, construido con `npm run build`).
+- **Servicios**: Nginx (puertos 80/8080), roscore, roslaunch (cámara, web_video_server). Scripts de arranque/parada: `start_atriz_lab.sh`, `stop.sh`.
+
+## Estructura de carpetas relevante
+
+- `swarm_lab_api/` — API FastAPI (app/, tests/).
+- `src/` — Paquetes ROS (web_server con launch de cámara y web_video).
+- `demiurge-tycho/` — Submódulo/packages (ArUco, transformer en C++).
+- `start_atriz_lab.sh`, `stop.sh` — Inicio y parada del lab (roscore, nginx, cámara, API, Vue).
+
+## Puertos y rutas
+
+- API: `http://0.0.0.0:5000`, prefijo `/api` para recursos. Documentación en `/admin/docs` y `/admin/redoc`.
+- Puertos que se liberan/inician: 80, 5000, 8000, 8080.
+
+## Git
+
+- Al hacer commits **no** añadir líneas tipo `Co-authored-by` ni ningún trailer de Cursor/IA. Solo el mensaje del commit, sin trailers adicionales.
+
+## Convenciones
+
+- **Idioma**: Código (nombres de variables, funciones, rutas) en **inglés**. Comentarios y mensajes visibles al usuario pueden estar en **español**.
+- **Robots**: Conexión por SSH a Raspberry Pi; entorno ROS con `source /opt/ros/noetic/setup.bash` y `source ~/atriz_git/devel/setup.bash`. Usuario por defecto: `ubuntu` (configurable con `SSH_USER`).
+- Al proponer cambios en scripts de arranque o API, tener en cuenta que el entorno de ejecución típico es **Linux** (paths como `~/catkin_ws`, `/var/log/swarm_lab.log`).

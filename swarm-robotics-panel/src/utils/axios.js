@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-// Configuración de Axios
+// API base URL (incluye /api). Local: localhost:5000; producción: definir VUE_APP_API_URL
+const apiBaseURL = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
+
 const instance = axios.create({
-  // baseURL: 'http://atriz-project.duckdns.org/api', // Ajusta la URL base a tu configuración
-  baseURL: 'http://10.20.50.228/api', // Ajusta la URL base a tu configuración
+  baseURL: apiBaseURL,
 });
 
 // Interceptor para añadir el token a cada solicitud

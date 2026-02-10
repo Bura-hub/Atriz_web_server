@@ -23,7 +23,7 @@ def create_new_robot(robot: RobotCreate, db: Session = Depends(get_db)):
 
 @router.post("/robots/execute/")
 async def execute_command_on_robot(robot_ip: str = Form(...), command: str = Form(...)):
-    user = os.getenv("SSH_USER", "sphero")
+    user = os.getenv("SSH_USER", "ubuntu")
 
     try:
         # Comando que incluye el sourcing de ROS
