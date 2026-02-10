@@ -1,6 +1,14 @@
 <template>
-  <div class="card-panel">
+  <div class="card-panel card-panel--relative">
     <h2 class="section-title">Transmisión de vídeo en vivo</h2>
+
+    <!-- Overlay de carga: cámara local o conexión MJPEG -->
+    <div v-if="loading || streamConnecting" class="loading-overlay loading-overlay--video">
+      <div class="loading-overlay__content">
+        <div class="loading-overlay__spinner" aria-hidden="true"></div>
+        <p class="loading-overlay__text">{{ loadingMessage }}</p>
+      </div>
+    </div>
 
     <!-- Origen: cámara local o stream MJPEG del robot -->
     <div class="video-source-select mb-4">
@@ -61,6 +69,19 @@
         <i class="fas fa-expand"></i>
       </button>
     </div>
+
+    <!-- Logs de estado (según desarrollo.tex: usb_cam, web_video_server, MJPEG) -->
+    <div class="results-box mt-4">
+      <h3 class="results-box__title">Estado del stream</h3>
+      <div v-if="streamLogs.length">
+        <ul class="results-list list-disc pl-5 space-y-0 results-list--logs">
+          <li v-for="(log, index) in streamLogs" :key="index" :class="logClass(log)" class="sim-step log-line">
+            {{ log.text }}
+          </li>
+        </ul>
+      </div>
+      <p v-else class="results-box__empty">Selecciona origen (cámara local o stream del robot) para ver el estado de conexión.</p>
+    </div>
   </div>
 </template>
 
@@ -81,6 +102,7 @@ export default {
       error: null,
       streamConnecting: false,
       streamConnectTimeout: null,
+      streamLogs: [],
     };
   },
   watch: {
@@ -88,6 +110,7 @@ export default {
       if (this.source === 'robot' && url) {
         this.streamConnecting = true;
         this.error = null;
+        if (!this.streamLogs.some(l => l.text.startsWith('[1/2]'))) this.pushLog('[1/2] Conectando a web_video_server (MJPEG)…', 'pending');
         clearTimeout(this.streamConnectTimeout);
         this.streamConnectTimeout = setTimeout(() => {
           if (this.streamConnecting) this.streamConnecting = false;
@@ -96,6 +119,11 @@ export default {
     },
   },
   computed: {
+    loadingMessage() {
+      if (this.loading) return "Solicitando acceso a la cámara (getUserMedia)…";
+      if (this.streamConnecting) return "Conectando al stream MJPEG (web_video_server)…";
+      return "Cargando…";
+    },
     mjpegUrl() {
       if (this.source !== "robot" || !this.robotIp?.trim()) return "";
       const ip = this.robotIp.trim();
@@ -106,7 +134,16 @@ export default {
     },
   },
   methods: {
+    pushLog(text, type = 'pending') {
+      this.streamLogs.push({ text, type });
+    },
+    logClass(log) {
+      if (log.type === 'success') return 'text-green-600 dark:text-green-400';
+      if (log.type === 'error') return 'text-red-600 dark:text-red-400';
+      return 'text-gray-600 dark:text-gray-400';
+    },
     onSourceChange() {
+      this.streamLogs = [];
       if (this.source === "local") {
         this.streamConnecting = false;
         clearTimeout(this.streamConnectTimeout);
@@ -115,16 +152,22 @@ export default {
       } else {
         this.stopCamera();
         this.error = null;
-        if (this.mjpegUrl) this.streamConnecting = true;
+        if (this.mjpegUrl) {
+          this.streamConnecting = true;
+          this.pushLog('[1/2] Conectando a web_video_server (MJPEG)…', 'pending');
+        }
       }
     },
     onMjpegLoad() {
       this.streamConnecting = false;
       clearTimeout(this.streamConnectTimeout);
+      if (this.streamLogs.length) this.pushLog('[2/2] Stream MJPEG activo (usb_cam → web_video_server).', 'success');
+      else this.pushLog('Stream MJPEG activo.', 'success');
     },
     onMjpegError() {
       this.streamConnecting = false;
       clearTimeout(this.streamConnectTimeout);
+      this.pushLog('Error al cargar el stream MJPEG. Comprueba la IP y que web_video_server esté en ejecución.', 'error');
     },
     async startCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -133,6 +176,7 @@ export default {
       }
       this.loading = true;
       this.error = null;
+      this.pushLog('[1/2] Solicitando acceso a la cámara (getUserMedia)…', 'pending');
       try {
         this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         const video = this.$refs.videoStream;
@@ -141,8 +185,10 @@ export default {
           this.streamActive = true;
           this.$nextTick(() => this.adjustVideoContainerSize());
         }
+        this.pushLog('[2/2] Cámara local activa.', 'success');
       } catch (err) {
         console.error('Error al acceder a la cámara:', err);
+        this.pushLog('Error: ' + (err.name === 'NotAllowedError' ? 'Acceso denegado.' : err.name === 'NotFoundError' ? 'No se encontró cámara.' : (err.message || 'error desconocido')), 'error');
         if (err.name === 'NotAllowedError') {
           this.error = 'Se ha denegado el acceso a la cámara. Permítelo en el navegador.';
         } else if (err.name === 'NotFoundError') {
@@ -222,6 +268,12 @@ export default {
 </script>
 
 <style scoped>
+.card-panel--relative {
+  position: relative;
+}
+.loading-overlay--video {
+  min-height: 120px;
+}
 .video-container--rounded {
   border-radius: 1rem;
   overflow: hidden;
