@@ -1,14 +1,26 @@
 from fastapi import APIRouter, HTTPException, Depends, Form
 from sqlalchemy.orm import Session
-from app.crud.robots import get_robot, create_robot
+from app.crud.robots import get_robot, get_robots, create_robot, delete_robot
 from app.schemas.robot import RobotCreate, Robot
 from app.db.session import get_db
+from app.core.config import settings
 import subprocess
-import os
 import signal
 
 router = APIRouter()
 running_processes = {}
+
+@router.get("/robots/", response_model=list[Robot])
+def list_robots(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+    return get_robots(db, skip=skip, limit=limit)
+
+@router.get("/robots/ssh-defaults")
+def get_ssh_defaults():
+    """Credenciales SSH por defecto del sistema (solo usuario; la contraseña no se expone)."""
+    return {
+        "username": settings.SSH_USER,
+        "auth_note": "key" if not settings.SSH_PASSWORD else "password",
+    }
 
 @router.get("/robots/{robot_id}", response_model=Robot)
 def read_robot(robot_id: int, db: Session = Depends(get_db)):
@@ -17,13 +29,19 @@ def read_robot(robot_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Robot not found")
     return robot
 
-@router.post("/robots/")
+@router.post("/robots/", response_model=Robot)
 def create_new_robot(robot: RobotCreate, db: Session = Depends(get_db)):
     return create_robot(db, robot)
 
+@router.delete("/robots/{robot_id}")
+def remove_robot(robot_id: int, db: Session = Depends(get_db)):
+    if not delete_robot(db, robot_id):
+        raise HTTPException(status_code=404, detail="Robot not found")
+    return {"status": "success", "message": "Robot eliminado."}
+
 @router.post("/robots/execute/")
 async def execute_command_on_robot(robot_ip: str = Form(...), command: str = Form(...)):
-    user = os.getenv("SSH_USER", "ubuntu")
+    user = settings.SSH_USER
 
     try:
         # Comando que incluye el sourcing de ROS
@@ -61,7 +79,7 @@ async def emergency_stop_robot(robot_ip: str = Form(...)):
     Parada de emergencia (E-Stop): publica en /rvr/emergency_stop en el robot
     para cortar potencia y sobrescribir comandos según el driver.
     """
-    user = os.getenv("SSH_USER", "ubuntu")
+    user = settings.SSH_USER
     # std_msgs/Empty: rostopic pub -1 /rvr/emergency_stop std_msgs/Empty "{}"
     command = "rostopic pub -1 /rvr/emergency_stop std_msgs/Empty '{}'"
     try:

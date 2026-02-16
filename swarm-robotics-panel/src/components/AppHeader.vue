@@ -115,20 +115,25 @@ export default {
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.22s ease,
+    transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s ease;
 }
 
-.app-header__logout:hover {
+.app-header__logout:hover:not(:disabled) {
   background: var(--danger-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
 }
 
-.app-header__logout:active {
-  transform: scale(0.98);
+.app-header__logout:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
 }
 
-.app-header__logout:focus {
+.app-header__logout:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.4);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.45);
 }
 
 .app-header__logout-text {
@@ -168,10 +173,26 @@ export default {
   border: 1px solid var(--accent);
   border-radius: var(--radius-md);
   text-decoration: none;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s ease;
 }
+
 .app-header__link:hover {
   background: var(--accent);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.app-header__link:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.app-header__link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 </style>

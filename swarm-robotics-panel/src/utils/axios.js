@@ -19,13 +19,19 @@ instance.interceptors.request.use(config => {
 });
 
 // Interceptor de respuesta: 401 → cerrar sesión y redirigir a login
+// No redirigir si: (1) skipAuthRedirect en config, o (2) ya estamos en /login (credenciales incorrectas)
 instance.interceptors.response.use(
   response => response,
   error => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('full_name');
-      window.location.href = '/login';
+      const isLoginPage = typeof window !== 'undefined' &&
+        /\/login\/?$/i.test(window.location.pathname || '');
+      const skipRedirect = error.config?.skipAuthRedirect === true || isLoginPage;
+      if (!skipRedirect) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('full_name');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

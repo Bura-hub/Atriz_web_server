@@ -6,3 +6,4 @@ class Robot(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     type = Column(String)
+    host = Column(String, index=True, nullable=True)  # IP address for SSH

@@ -18,6 +18,10 @@ class Settings(BaseSettings):
         "CORS_ORIGINS",
         "http://localhost:8080,http://localhost,http://10.20.50.228,http://atriz-project.duckdns.org"
     )
+    # SSH por defecto para robots (usuario del sistema en las Raspberry Pi).
+    SSH_USER: str = os.getenv("SSH_USER", "ubuntu")
+    # Contraseña SSH opcional; si está vacía se asume autenticación por clave.
+    SSH_PASSWORD: str = os.getenv("SSH_PASSWORD", "")
 
     class Config:
         env_file = ".env"

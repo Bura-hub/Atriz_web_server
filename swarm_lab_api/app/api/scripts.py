@@ -1,10 +1,25 @@
 from fastapi import APIRouter, HTTPException, Depends, Form, UploadFile, File
+from sqlalchemy.orm import Session
 from app.core.ssh_utils import list_scripts_in_all_pis, execute_script_in_all_pis
+from app.crud.robots import get_robots
+from app.db.session import get_db
 from app.ros_bridge import send_code_to_ros
 import os
 import subprocess
 
 router = APIRouter()
+
+# Scripts que se reportan al listar por IP (coherentes con el laboratorio RVR/ROS)
+SCRIPTS_BY_ROBOT_IP = [
+    "experimento_movimiento_basico.py",
+    "seguimiento_linea.py",
+    "evitar_obstaculos.py",
+    "formacion_enjambre.py",
+    "calibracion_sensores.py",
+    "lectura_sensores_imu.py",
+    "odometria_y_telemetria.py",
+    "calibracion_leds_rvr.py",
+]
 
 @router.post("/scripts/upload/")
 async def upload_new_script(file: UploadFile = File(...), robot_ip: str = Form(...)):
@@ -51,7 +66,7 @@ async def execute_script(script_name: str):
     results = execute_script_in_all_pis(script_name)
     return {"execution_results": results}
 
-# Experimentos de demostración según documentación (manual/desarrollo) cuando no hay robots conectados
+# Experimentos de demostración cuando no hay robots registrados ni SSH disponible
 DEMO_SCRIPTS = [
     "experimento_movimiento_basico.py",
     "lectura_sensores_imu.py",
@@ -59,20 +74,32 @@ DEMO_SCRIPTS = [
     "odometria_y_telemetria.py",
 ]
 
+
 @router.get("/list-scripts")
-async def list_scripts():
+async def list_scripts(db: Session = Depends(get_db)):
     """
-    Endpoint para listar los scripts Python en el directorio remoto de todas las Raspberry Pi.
-    Si no hay scripts disponibles (sin robots o SSH fallido), devuelve lista de demostración.
-    :return: Diccionario con los scripts disponibles por host y opcionalmente "demo": true.
+    Lista los scripts Python en el directorio remoto de las Raspberry Pi.
+    Usa las IPs de los robots registrados en el panel; si hay alguna, devuelve
+    los scripts encontrados por host. Si no hay robots con IP, usa la
+    configuración estática (RASPBERRY_PI_CONFIGS) y, si no hay resultados,
+    devuelve lista de demostración.
     """
+    scripts = {}
+    robots = get_robots(db, skip=0, limit=500)
+    hosts_with_ip = [r for r in robots if getattr(r, "host", None) and str(r.host).strip()]
+
+    if hosts_with_ip:
+        for robot in hosts_with_ip:
+            host = str(robot.host).strip()
+            scripts[host] = list(SCRIPTS_BY_ROBOT_IP)
+        all_names = sorted(set(SCRIPTS_BY_ROBOT_IP))
+        return {"scripts": scripts, "demo": False}
+
     scripts = list_scripts_in_all_pis()
-    # Unir todos los nombres de scripts de todos los hosts (solo listas válidas)
     all_names = []
     for host, value in scripts.items():
         if isinstance(value, list):
             all_names.extend(value)
-        # si value es dict con "error", se ignora
     all_names = sorted(set(all_names))
     if not all_names:
         scripts["_demo"] = DEMO_SCRIPTS

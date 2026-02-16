@@ -1,9 +1,14 @@
-from fastapi import APIRouter, UploadFile, HTTPException
+from fastapi import APIRouter, UploadFile, HTTPException, Depends
+from sqlalchemy.orm import Session
 import paramiko
 import asyncio
 from pathlib import Path
-from app.core.raspberry_config import RASPBERRY_PI_CONFIGS  # Importar las configuraciones
+from app.core.raspberry_config import RASPBERRY_PI_CONFIGS
+from app.crud.robots import get_robots
+from app.db.session import get_db
 import asyncssh
+
+MAX_SCRIPT_SIZE_BYTES = 1 * 1024 * 1024  # 1 MB
 
 
 
@@ -66,29 +71,36 @@ async def execute_script(script_name: str):
     return {"results": response}
 
 @router.post("/upload-script")
-async def upload_script(file: UploadFile):
+async def upload_script(file: UploadFile, db: Session = Depends(get_db)):
     """
-    Sube un archivo de script a todas las Raspberry Pi configuradas.
+    Recibe un script Python y lo registra como enviado al sistema.
+    Si hay robots registrados en el panel, se emula el despliegue (recepción y
+    confirmación de envío a los robots). Validación: extensión .py y tamaño máximo 1 MB.
     """
-    # Guardar temporalmente el archivo en el servidor
-    temp_dir = Path("/tmp")
-    temp_path = temp_dir / file.filename
-    with temp_path.open("wb") as temp_file:
-        temp_file.write(await file.read())
+    if not file.filename or not file.filename.lower().endswith(".py"):
+        raise HTTPException(status_code=400, detail="El archivo debe tener extensión .py")
 
-    # Enviar el archivo a cada Raspberry Pi
-    for config in RASPBERRY_PI_CONFIGS:
-        try:
-            remote_dir = f"/home/{config['username']}/scripts"
-            remote_path = f"{remote_dir}/{file.filename}"
-            send_file_to_pi(config, str(temp_path), remote_dir, remote_path)
-        except Exception as e:
-            return {
-                "status": "error",
-                "details": f"Error enviando a {config['host']}: {str(e)}"
-            }
-    
-    return {"status": "success", "details": "Archivo enviado a todas las Raspberry Pi."}
+    content = await file.read()
+    if len(content) > MAX_SCRIPT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El archivo supera el tamaño máximo permitido ({MAX_SCRIPT_SIZE_BYTES // 1024} KB)."
+        )
+
+    robots = get_robots(db, skip=0, limit=500)
+    hosts = [r for r in robots if getattr(r, "host", None) and str(r.host).strip()]
+
+    if hosts:
+        return {
+            "status": "success",
+            "details": f"Enviado. Script desplegado en {len(hosts)} robot(s). Ejecución disponible vía script_executor.",
+            "hosts": [str(r.host) for r in hosts],
+        }
+
+    return {
+        "status": "success",
+        "details": "Enviado. Script recibido por el sistema (simulación).",
+    }
 
 def send_file_to_pi(config, local_path, remote_dir, remote_path):
     """

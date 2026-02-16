@@ -88,7 +88,10 @@ export default {
         const response = await axios.post(
           '/login',
           qs.stringify({ username: this.username, password: this.password }),
-          { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+          {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            skipAuthRedirect: true
+          }
         );
         const accessToken = response.data.access_token;
         localStorage.setItem('access_token', accessToken);
@@ -136,7 +139,7 @@ export default {
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-lg);
-  transition: opacity 0.25s ease, transform 0.35s ease;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   opacity: 0;
   transform: translateY(24px) scale(0.96);
 }
@@ -157,7 +160,7 @@ export default {
 }
 
 .login-success {
-  animation: login-success-in 0.4s ease;
+  animation: login-success-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .login-success__icon {
@@ -250,6 +253,15 @@ export default {
   font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 0.375rem;
+  transition: color 0.2s ease;
+}
+
+.login-card .input-field {
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.login-card .input-field:hover:not(:focus) {
+  border-color: var(--border-strong);
 }
 
 .login-card__btn {
@@ -263,7 +275,10 @@ export default {
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  transition:
+    background 0.22s ease,
+    transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -272,12 +287,12 @@ export default {
 
 .login-card__btn:hover:not(:disabled) {
   background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px var(--accent-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--accent-glow);
 }
 
 .login-card__btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 .login-card__btn:disabled {
@@ -285,7 +300,7 @@ export default {
   cursor: not-allowed;
 }
 
-.login-card__btn:focus {
+.login-card__btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
@@ -313,5 +328,6 @@ export default {
   background: var(--danger-muted);
   border-radius: var(--radius-md);
   border: 1px solid rgba(225, 29, 72, 0.35);
+  animation: slideInBanner 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 </style>

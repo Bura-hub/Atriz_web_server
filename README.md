@@ -2,6 +2,8 @@
 
 Laboratorio de robótica swarm (SW-AR-LabRE): panel web Vue 3, API FastAPI, integración con ROS y robots (Sphero RVR, Raspberry Pi).
 
+**Guía de instalación desde el repositorio (rama `pruebas`):** [GUIA_INSTALACION.md](GUIA_INSTALACION.md) — incluye enlace al repo, requisitos, clonado y puesta en marcha.
+
 ## Instalación y ejecución (quien clone el repo)
 
 Para **instalar y ejecutar la aplicación** después de clonar:
